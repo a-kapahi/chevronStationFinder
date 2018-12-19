@@ -1,7 +1,6 @@
 package com.example.chevron_stationfinder;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -137,12 +135,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        if (b) {
-            compoundButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        }
-        else {
-            compoundButton.setBackgroundColor(Color.WHITE);
-        }
+        compoundButton.setBackgroundTintList(getContext().getResources().getColorStateList(R.color.filter_button_state_list));
         switch (compoundButton.getId()){
             case R.id.diesel: {
                 hasDiesel = hasDiesel?false:true;
