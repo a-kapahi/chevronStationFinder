@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3d85f2</color>
+    <color name="colorPrimaryDark">#296bcf</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="lightGrey">#e3e3e3</color>
+    <color name="background_shadow">#ad000000</color>
+    <color name="station_list_container_background">#f6f6f6</color>
+    <color name="text_blue">#4a90e2</color>
+    <color name="text_station_list_count_bg_grey">#dfdfdf</color>
+</resources>
