@@ -22,12 +22,13 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class StationListFragment extends Fragment implements View.OnClickListener {
+public class StationListFragment extends Fragment implements View.OnClickListener, OnStationListReady {
 
     private ArrayList<Station> stations;
     private OnListFragmentInteractionListener mListListener;
     private OnFragmentInteractionListener mListener;
     private String address;
+    private MystationRecyclerViewAdapter recyclerViewAdapter;
 
 
     /**
@@ -66,7 +67,8 @@ public class StationListFragment extends Fragment implements View.OnClickListene
             //helper.attachToRecyclerView(recyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new MystationRecyclerViewAdapter(stations, mListListener));
+        recyclerViewAdapter = new MystationRecyclerViewAdapter(stations, mListListener);
+        recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -111,6 +113,13 @@ public class StationListFragment extends Fragment implements View.OnClickListene
                 mListener.onFragmentInteraction("ListFragment", view);
             }
         }
+    }
+
+    @Override
+    public void onListReady(ArrayList<Station> filteredStations) {
+        stations.clear();
+        stations.addAll(filteredStations);
+        recyclerViewAdapter.notifyDataSetChanged();
     }
 
     /**

@@ -7,6 +7,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -44,12 +45,14 @@ public class MainActivity extends AppCompatActivity
     private Location loc;
     private ArrayList<Station> stations;
     private GoogleMap gMap;
+    private OnStationListReady listReady;
+    private StationListFragment stationListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        stations = new ArrayList<>();
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -66,12 +69,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onAttachFragment(Fragment fragment) {
+        if (fragment instanceof StationListFragment) {
+            listReady = (StationListFragment) fragment;
+        }
+    }
+
+
+    @Override
     public void onFragmentInteraction(String TAG, Object o) {
         if(TAG.equals("SearchFragment")){
             View view = (View)o;
             switch (view.getId()){
                 case R.id.button:{
                     Log.d("msg","Nearby presssed");
+                    stationListFragment = StationListFragment.newInstance(stations, "Current Location");
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, stationListFragment).commit();
+                    transaction.addToBackStack(null);
                     getNearbyStations(loc,1);
                     break;
                 }
@@ -119,10 +134,8 @@ public class MainActivity extends AppCompatActivity
                 if (filters[4])
                     filteredStations.removeIf(s -> Integer.valueOf(s.getCarwash()) == 0);
                 if (filters[5]) filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
-                StationListFragment listFragment = StationListFragment.newInstance(filteredStations, "Current Location");
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, listFragment).commit();
-                transaction.addToBackStack(null);
+                listReady.onListReady(filteredStations);
+                getSupportFragmentManager().popBackStack();
 
             }
         }
@@ -183,15 +196,12 @@ public class MainActivity extends AppCompatActivity
                         stations = stationList.stations;
                         markMap(stations);
                         if(flag==1){
-                            StationListFragment listFragment = StationListFragment.newInstance(stationList.stations, "Current Location");
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.fragment_container, listFragment).commit();
-                            transaction.addToBackStack(null);
+                            listReady.onListReady(stations);
                         }
                         else if(flag==2){
-                            StationListFragment listFragment = StationListFragment.newInstance(stationList.stations, location.getExtras().getString("address"));
+                            stationListFragment = StationListFragment.newInstance(stationList.stations, location.getExtras().getString("address"));
                             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.fragment_container, listFragment).commit();
+                            transaction.replace(R.id.fragment_container, stationListFragment).commit();
                             transaction.addToBackStack(null);
                         }
                         else{
