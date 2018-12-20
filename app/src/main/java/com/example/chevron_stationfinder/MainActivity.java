@@ -106,17 +106,35 @@ public class MainActivity extends AppCompatActivity
                         getSupportFragmentManager().popBackStack();
                     }
                 }
+            } else if (o instanceof Boolean[]) {
+                Boolean[] filters = (Boolean[]) o;
+                ArrayList<Station> filteredStations = new ArrayList<>();
+                filteredStations.addAll(stations);
+                if (filters[0])
+                    filteredStations.removeIf(s -> Integer.valueOf(s.getExtramile()) == 0);
+                if (filters[1])
+                    filteredStations.removeIf(s -> Integer.valueOf(s.getLoyalty()) == 0);
+                if (filters[2]) filteredStations.removeIf(s -> Integer.valueOf(s.getCstore()) == 0);
+                if (filters[3]) filteredStations.removeIf(s -> Integer.valueOf(s.getNfc()) == 0);
+                if (filters[4])
+                    filteredStations.removeIf(s -> Integer.valueOf(s.getCarwash()) == 0);
+                if (filters[5]) filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
+                StationListFragment listFragment = StationListFragment.newInstance(filteredStations, "Current Location");
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, listFragment).commit();
+                transaction.addToBackStack(null);
+
             }
         }
 
         else if(TAG.equals("searchAddress")){
             Place place = (Place)o;
             Location location = new Location("location");
-            LatLng latLng = ((Place) o).getLatLng();
+            LatLng latLng = place.getLatLng();
             location.setLatitude(latLng.latitude);
             location.setLongitude(latLng.longitude);
             Bundle extra = new Bundle();
-            extra.putString("address",String.valueOf(((Place) o).getAddress()));
+            extra.putString("address", String.valueOf(place.getAddress()));
             location.setExtras(extra);
             gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     latLng, 13));

@@ -114,8 +114,8 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.resultsBtn: {
-
-                //mListener.onFragmentInteraction("ThatHas");
+                Boolean[] filters = {hasExtraMile, hasGroceryRewards, hasStore, hasTapToPay, hasCarWash, hasDiesel};
+                mListener.onFragmentInteraction("ThatHas", filters);
                 break;
             }
         }

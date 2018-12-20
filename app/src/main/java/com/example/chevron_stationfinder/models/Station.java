@@ -28,6 +28,31 @@ public class Station implements Parcelable {
     private String zip;
     private String phone;
     private String ccc;
+
+    public String getExtramile() {
+        return extramile;
+    }
+
+    public String getCstore() {
+        return cstore;
+    }
+
+    public String getCarwash() {
+        return carwash;
+    }
+
+    public String getLoyalty() {
+        return loyalty;
+    }
+
+    public String getDiesel() {
+        return diesel;
+    }
+
+    public String getNfc() {
+        return nfc;
+    }
+
     private String extramile;
     private String cstore;
     private String carwash;
