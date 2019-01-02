@@ -7,12 +7,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.chevron_stationfinder.SearchAddressFragment.OnListFragmentInteractionListener;
+import com.example.chevron_stationfinder.models.Prediction;
 
 import java.util.ArrayList;
 
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link com.example.chevron_stationfinder.Prediction} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Prediction} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */

@@ -29,7 +29,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     private OnFragmentInteractionListener mListener;
     private String address;
     private MystationRecyclerViewAdapter recyclerViewAdapter;
-
+    private TextView stationCount;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -78,7 +78,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
                  }
                 }
             });
-        TextView stationCount = view.findViewById(R.id.stationCount);
+        stationCount = view.findViewById(R.id.stationCount);
         Button optionsButton = view.findViewById(R.id.optionsBtn);
         optionsButton.setOnClickListener(this);
         stationCount.setText(String.valueOf(stations.size()));
@@ -120,6 +120,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         stations.clear();
         stations.addAll(filteredStations);
         recyclerViewAdapter.notifyDataSetChanged();
+        stationCount.setText(String.valueOf(stations.size()));
     }
 
     /**

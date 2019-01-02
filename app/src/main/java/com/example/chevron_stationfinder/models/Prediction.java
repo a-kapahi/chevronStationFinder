@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.models;
 
 public class Prediction {
     private String description;

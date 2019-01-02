@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -15,11 +16,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.example.chevron_stationfinder.models.Prediction;
 import com.example.chevron_stationfinder.models.Station;
 import com.example.chevron_stationfinder.models.StationList;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -34,6 +35,13 @@ import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -48,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleMap gMap;
     private OnStationListReady listReady;
     private StationListFragment stationListFragment;
+    private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,20 +160,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        else if(TAG.equals("searchAddress")){
-            Place place = (Place)o;
-            Location location = new Location("location");
-            LatLng latLng = place.getLatLng();
-            location.setLatitude(latLng.latitude);
-            location.setLongitude(latLng.longitude);
-            Bundle extra = new Bundle();
-            extra.putString("address", String.valueOf(place.getAddress()));
-            location.setExtras(extra);
-            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    latLng, 13));
-            gMap.addMarker(new MarkerOptions().position(latLng));
-            getNearbyStations(location,2);
-        }
     }
 
     @Override
@@ -265,6 +260,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void markMap(ArrayList<Station> stations){
+        //gMap.clear();
         for(Station station: stations){
             gMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
@@ -274,6 +270,69 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Prediction item) {
+        new GetPredictionLatLng().execute(item.getPlace_id(), item.getDescription());
+    }
 
+
+    private class GetPredictionLatLng extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String url = makeUrl(strings[0]);
+            String results = getUrlContents(url);
+            try {
+                JSONObject object = new JSONObject(results);
+                object = object.getJSONObject("result");
+                object = object.getJSONObject("geometry");
+                object = object.getJSONObject("location");
+                Location location = new Location("location");
+                LatLng latLng = new LatLng(object.getDouble("lat"), object.getDouble("lng"));
+                location.setLatitude(object.getDouble("lat"));
+                location.setLongitude(object.getDouble("lng"));
+                Bundle extra = new Bundle();
+                extra.putString("address", strings[1]);
+                location.setExtras(extra);
+                Log.d("result", object.toString());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                latLng, 13));
+                        gMap.addMarker(new MarkerOptions().position(latLng));
+                        getSupportFragmentManager().popBackStack();
+                        getNearbyStations(location, 2);
+                    }
+                });
+
+
+            } catch (JSONException e) {
+                Log.e("ERROR", "Unable to parse JSON");
+            }
+            return null;
+        }
+
+        private String makeUrl(String placeID) {
+            StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
+            urlString.append("placeid=" + placeID);
+            urlString.append("&sensor=true&key=" + KEY);
+            return urlString.toString();
+        }
+
+        private String getUrlContents(String theUrl) {
+            StringBuilder content = new StringBuilder();
+            try {
+                URL url = new URL(theUrl);
+                URLConnection urlConnection = url.openConnection();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    content.append(line + "\n");
+                }
+                bufferedReader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return content.toString();
+        }
     }
 }

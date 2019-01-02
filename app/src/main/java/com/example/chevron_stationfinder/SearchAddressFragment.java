@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
+import com.example.chevron_stationfinder.models.Prediction;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -134,10 +136,10 @@ public class SearchAddressFragment extends Fragment {
     }
 
 
-    private class GetPredictions extends AsyncTask<String, Void, String> {
+    private class GetPredictions extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected String doInBackground(String... strings) {
+        protected Void doInBackground(String... strings) {
             String url = makeUrl(strings[0]);
             String results = getUrlContents(url);
             try {
