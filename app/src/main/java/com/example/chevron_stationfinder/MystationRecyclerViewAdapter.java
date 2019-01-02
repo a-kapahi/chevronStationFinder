@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.chevron_stationfinder.models.Station;
 import com.example.chevron_stationfinder.StationListFragment.OnListFragmentInteractionListener;
+import com.example.chevron_stationfinder.models.Station;
 
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_station, parent, false);
+                .inflate(R.layout.fragment_station_list_item, parent, false);
         return new ViewHolder(view);
     }
 

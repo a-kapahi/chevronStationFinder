@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.example.chevron_stationfinder.models.Station;
 import com.example.chevron_stationfinder.models.StationList;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
-        implements OnFragmentInteractionListener, OnMapReadyCallback, StationListFragment.OnListFragmentInteractionListener {
+        implements OnFragmentInteractionListener, OnMapReadyCallback, StationListFragment.OnListFragmentInteractionListener, SearchAddressFragment.OnListFragmentInteractionListener {
 
     private FusedLocationProviderClient mFusedLocationClient;
     public static final String RELATIVE_URL_FOR_NEAR_ME 	= "ws_getChevronTexacoNearMe_r2.aspx"; // "GetChevronWithTechronNearMe.aspx";
@@ -92,15 +93,25 @@ public class MainActivity extends AppCompatActivity
                 }
                 case R.id.button2:{
                     Log.d("msg","near Address");
+                    FrameLayout fullFragment = findViewById(R.id.full_fragment_container);
+                    fullFragment.setVisibility(View.VISIBLE);
                     SearchAddressFragment searchAddressFragment = new SearchAddressFragment();
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, searchAddressFragment);
+                    transaction.replace(R.id.full_fragment_container, searchAddressFragment);
                     transaction.commit();
+                    transaction.addToBackStack(null);
                     break;
                 }
                 case R.id.button3:{
                     Log.d("msg","That has");
-                    getNearbyStations(loc,3);
+                    stationListFragment = StationListFragment.newInstance(stations, "Current Location");
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
+                    SearchThatHasFragment thatHasFragment = new SearchThatHasFragment();
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
+                    transaction.commit();
+                    getNearbyStations(loc, 1);
                     break;
                 }
 
@@ -205,10 +216,7 @@ public class MainActivity extends AppCompatActivity
                             transaction.addToBackStack(null);
                         }
                         else{
-                            SearchThatHasFragment thatHasFragment = new SearchThatHasFragment();
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
-                            transaction.commit();
+
                         }
 
 
@@ -262,5 +270,10 @@ public class MainActivity extends AppCompatActivity
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.techron_logo_lockup)));
         }
+    }
+
+    @Override
+    public void onListFragmentInteraction(Prediction item) {
+
     }
 }

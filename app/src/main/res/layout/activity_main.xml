@@ -55,4 +55,18 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/full_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map">
+
+    </FrameLayout>
+
 </android.support.constraint.ConstraintLayout>

@@ -68,7 +68,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider7"
         tools:context=".StationListFragment"
-        tools:listitem="@layout/fragment_station" />
+        tools:listitem="@layout/fragment_station_list_item" />
 
     <TextView
         android:id="@+id/address"
