@@ -1,5 +1,6 @@
 package com.example.chevron_stationfinder;
 
+import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +16,8 @@ import java.util.ArrayList;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Station} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
+
 public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<MystationRecyclerViewAdapter.ViewHolder> {
 
     private final ArrayList<Station> stations;
@@ -51,6 +52,7 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
                 else{
                     holder.amenitiesLayout.setVisibility(View.VISIBLE);
                     params.topToBottom = holder.amenitiesLayout.getId();
+                    setAmenities(holder);
                 }
             }
         });
@@ -69,6 +71,15 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
         });
     }
 
+    private void setAmenities(ViewHolder holder) {
+        holder.diesel.setTextColor((Integer.valueOf(holder.station.getDiesel()) == 0) ? Color.GRAY : Color.BLACK);
+        holder.carWash.setTextColor((Integer.valueOf(holder.station.getCarwash()) == 0) ? Color.GRAY : Color.BLACK);
+        holder.tapToPay.setTextColor((Integer.valueOf(holder.station.getNfc()) == 0) ? Color.GRAY : Color.BLACK);
+        holder.extraMile.setTextColor((Integer.valueOf(holder.station.getExtramile()) == 0) ? Color.GRAY : Color.BLACK);
+        holder.store.setTextColor((Integer.valueOf(holder.station.getCstore()) == 0) ? Color.GRAY : Color.BLACK);
+        holder.rewards.setTextColor((Integer.valueOf(holder.station.getLoyalty()) == 0) ? Color.GRAY : Color.BLACK);
+    }
+
     @Override
     public int getItemCount() {
         return stations.size();
@@ -83,6 +94,12 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
         public final TextView amenities;
         public final TextView directions;
         public final TextView details;
+        public final TextView extraMile;
+        public final TextView tapToPay;
+        public final TextView carWash;
+        public final TextView diesel;
+        public final TextView store;
+        public final TextView rewards;
         public Station station;
 
         public ViewHolder(View view) {
@@ -95,6 +112,12 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
             amenities = view.findViewById(R.id.btnAmenities);
             directions = view.findViewById(R.id.btnDirections);
             details = view.findViewById(R.id.btnDetails);
+            extraMile = view.findViewById(R.id.extraMile);
+            tapToPay = view.findViewById(R.id.tapPay);
+            carWash = view.findViewById(R.id.carWash);
+            diesel = view.findViewById(R.id.diesel);
+            store = view.findViewById(R.id.store);
+            rewards = view.findViewById(R.id.rewards);
         }
 
         @Override

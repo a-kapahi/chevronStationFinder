@@ -58,18 +58,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list"
-        android:name="com.example.chevron_stationfinder.stationListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="380dp"
-        android:background="@color/lightGrey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider7"
-        tools:context=".StationListFragment"
-        tools:listitem="@layout/fragment_station_list_item" />
-
     <TextView
         android:id="@+id/address"
         android:layout_width="wrap_content"
@@ -79,5 +67,21 @@
         android:text="Current Location"
         app:layout_constraintStart_toEndOf="@+id/stationCount"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:name="com.example.chevron_stationfinder.stationListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:background="@color/lightGrey"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingBottom="240dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider7"
+        tools:context=".StationListFragment"
+        tools:listitem="@layout/fragment_station_list_item" />
 
 </android.support.constraint.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.example.chevron_stationfinder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,20 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
         TextView stationDistance = view.findViewById(R.id.stationDistance);
         TextView stationPhone = view.findViewById(R.id.stationPhone);
         TextView directions = view.findViewById(R.id.btnDirections);
+        TextView extraMile = view.findViewById(R.id.extraMile);
+        TextView tapToPay = view.findViewById(R.id.tapToPay);
+        TextView carWash = view.findViewById(R.id.carWash);
+        TextView diesel = view.findViewById(R.id.diesel);
+        TextView store = view.findViewById(R.id.store);
+        TextView rewards = view.findViewById(R.id.rewards);
+
+        diesel.setTextColor((Integer.valueOf(station.getDiesel()) == 0) ? Color.GRAY : Color.BLACK);
+        carWash.setTextColor((Integer.valueOf(station.getCarwash()) == 0) ? Color.GRAY : Color.BLACK);
+        tapToPay.setTextColor((Integer.valueOf(station.getNfc()) == 0) ? Color.GRAY : Color.BLACK);
+        extraMile.setTextColor((Integer.valueOf(station.getExtramile()) == 0) ? Color.GRAY : Color.BLACK);
+        store.setTextColor((Integer.valueOf(station.getCstore()) == 0) ? Color.GRAY : Color.BLACK);
+        rewards.setTextColor((Integer.valueOf(station.getLoyalty()) == 0) ? Color.GRAY : Color.BLACK);
+
         stationName.setText(station.getName());
         stationAddress.setText(station.getAddress());
         stationDistance.setText(station.getDistance().substring(0,3).concat(" Miles"));
@@ -83,6 +98,7 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
         super.onDetach();
         mListener = null;
     }
+
 
     @Override
     public void onClick(View v){
