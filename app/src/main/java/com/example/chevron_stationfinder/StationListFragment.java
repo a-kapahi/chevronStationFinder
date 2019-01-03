@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     private String address;
     private MystationRecyclerViewAdapter recyclerViewAdapter;
     private TextView stationCount;
+    private RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,9 +65,10 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         View view = inflater.inflate(R.layout.fragment_station_list, container, false);
         Context context = view.getContext();
         TextView address = view.findViewById(R.id.address);
-        RecyclerView recyclerView = view.findViewById(R.id.list);
-            //SnapHelper helper = new LinearSnapHelper();
-            //helper.attachToRecyclerView(recyclerView);
+        recyclerView = view.findViewById(R.id.list);
+        checkEmptyList();
+        SnapHelper helper = new LinearSnapHelper();
+        helper.attachToRecyclerView(recyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerViewAdapter = new MystationRecyclerViewAdapter(stations, mListListener);
@@ -121,6 +125,13 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         stations.addAll(filteredStations);
         recyclerViewAdapter.notifyDataSetChanged();
         stationCount.setText(String.valueOf(stations.size()));
+        checkEmptyList();
+    }
+
+    public void checkEmptyList() {
+        if (stations.isEmpty()) {
+            recyclerView.setVisibility(View.INVISIBLE);
+        } else recyclerView.setVisibility(View.VISIBLE);
     }
 
     /**

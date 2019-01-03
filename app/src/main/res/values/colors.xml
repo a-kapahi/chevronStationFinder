@@ -7,5 +7,7 @@
     <color name="background_shadow">#ad000000</color>
     <color name="station_list_container_background">#f6f6f6</color>
     <color name="text_blue">#4a90e2</color>
+    <color name="text_grey">#5e5e5e</color>
     <color name="text_station_list_count_bg_grey">#dfdfdf</color>
+
 </resources>

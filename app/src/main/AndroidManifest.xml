@@ -16,6 +16,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM">
         </meta-data>
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
