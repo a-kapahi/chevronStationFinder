@@ -33,6 +33,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
     private boolean hasCarWash;
     private boolean hasStore;
     private boolean hasGroceryRewards;
+    private Integer distance;
 
     public SearchThatHasFragment() {
         // Required empty public constructor
@@ -114,7 +115,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.resultsBtn: {
-                Boolean[] filters = {hasExtraMile, hasGroceryRewards, hasStore, hasTapToPay, hasCarWash, hasDiesel};
+                Integer[] filters = new Integer[]{hasExtraMile ? 1 : 0, hasGroceryRewards ? 1 : 0, hasStore ? 1 : 0, hasTapToPay ? 1 : 0, hasCarWash ? 1 : 0, hasDiesel ? 1 : 0, distance};
                 mListener.onFragmentInteraction("ThatHas", filters);
                 break;
             }
@@ -124,7 +125,8 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         String distance = (String)parent.getItemAtPosition(pos);
-        Log.d("Spinner selected",distance.substring(0,2).trim()+"miles");
+        this.distance = Integer.valueOf(distance.substring(0, 2).trim());
+        Log.d("Spinner selected", this.distance + "miles");
 
     }
 

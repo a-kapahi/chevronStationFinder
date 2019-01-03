@@ -28,31 +28,6 @@ public class Station implements Parcelable {
     private String zip;
     private String phone;
     private String ccc;
-
-    public String getExtramile() {
-        return extramile;
-    }
-
-    public String getCstore() {
-        return cstore;
-    }
-
-    public String getCarwash() {
-        return carwash;
-    }
-
-    public String getLoyalty() {
-        return loyalty;
-    }
-
-    public String getDiesel() {
-        return diesel;
-    }
-
-    public String getNfc() {
-        return nfc;
-    }
-
     private String extramile;
     private String cstore;
     private String carwash;
@@ -65,8 +40,10 @@ public class Station implements Parcelable {
     private String nfc;
     private String giftcard;
     private String distance;
+
     public Station() {
     }
+
     protected Station(Parcel in) {
         this.id = in.readString();
         this.name = in.readString();
@@ -91,6 +68,30 @@ public class Station implements Parcelable {
         this.nfc = in.readString();
         this.giftcard = in.readString();
         this.distance = in.readString();
+    }
+
+    public String getExtramile() {
+        return extramile;
+    }
+
+    public String getCstore() {
+        return cstore;
+    }
+
+    public String getCarwash() {
+        return carwash;
+    }
+
+    public String getLoyalty() {
+        return loyalty;
+    }
+
+    public String getDiesel() {
+        return diesel;
+    }
+
+    public String getNfc() {
+        return nfc;
     }
 
     public String getName() {

@@ -141,19 +141,23 @@ public class MainActivity extends AppCompatActivity
                         getSupportFragmentManager().popBackStack();
                     }
                 }
-            } else if (o instanceof Boolean[]) {
-                Boolean[] filters = (Boolean[]) o;
+            } else if (o instanceof Integer[]) {
+                Integer[] filters = (Integer[]) o;
                 ArrayList<Station> filteredStations = new ArrayList<>();
                 filteredStations.addAll(stations);
-                if (filters[0])
+                filteredStations.removeIf(s -> Float.valueOf(s.getDistance()) > filters[6]);
+                if (filters[0] == 1)
                     filteredStations.removeIf(s -> Integer.valueOf(s.getExtramile()) == 0);
-                if (filters[1])
+                if (filters[1] == 1)
                     filteredStations.removeIf(s -> Integer.valueOf(s.getLoyalty()) == 0);
-                if (filters[2]) filteredStations.removeIf(s -> Integer.valueOf(s.getCstore()) == 0);
-                if (filters[3]) filteredStations.removeIf(s -> Integer.valueOf(s.getNfc()) == 0);
-                if (filters[4])
+                if (filters[2] == 1)
+                    filteredStations.removeIf(s -> Integer.valueOf(s.getCstore()) == 0);
+                if (filters[3] == 1)
+                    filteredStations.removeIf(s -> Integer.valueOf(s.getNfc()) == 0);
+                if (filters[4] == 1)
                     filteredStations.removeIf(s -> Integer.valueOf(s.getCarwash()) == 0);
-                if (filters[5]) filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
+                if (filters[5] == 1)
+                    filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
                 listReady.onListReady(filteredStations);
                 getSupportFragmentManager().popBackStack();
 
@@ -260,7 +264,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void markMap(ArrayList<Station> stations){
-        //gMap.clear();
+        gMap.clear();
         for(Station station: stations){
             gMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
