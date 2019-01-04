@@ -49,14 +49,14 @@ import cz.msebera.android.httpclient.Header;
 public class MainActivity extends AppCompatActivity
         implements OnFragmentInteractionListener, OnMapReadyCallback, StationListFragment.OnListFragmentInteractionListener, SearchAddressFragment.OnListFragmentInteractionListener {
 
+    public static final String RELATIVE_URL_FOR_NEAR_ME = "ws_getChevronTexacoNearMe_r2.aspx"; // "GetChevronWithTechronNearMe.aspx";
+    private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
     private FusedLocationProviderClient mFusedLocationClient;
-    public static final String RELATIVE_URL_FOR_NEAR_ME 	= "ws_getChevronTexacoNearMe_r2.aspx"; // "GetChevronWithTechronNearMe.aspx";
     private Location loc;
     private ArrayList<Station> stations;
     private GoogleMap gMap;
     private OnStationListReady listReady;
     private StationListFragment stationListFragment;
-    private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,20 +88,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(String TAG, Object o) {
-        if(TAG.equals("SearchFragment")){
-            View view = (View)o;
-            switch (view.getId()){
-                case R.id.button:{
-                    Log.d("msg","Nearby presssed");
+        if (TAG.equals("SearchFragment")) {
+            View view = (View) o;
+            switch (view.getId()) {
+                case R.id.button: {
+                    Log.d("msg", "Nearby presssed");
                     stationListFragment = StationListFragment.newInstance(stations, "Current Location");
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).commit();
                     transaction.addToBackStack(null);
-                    getNearbyStations(loc,1);
+                    getNearbyStations(loc, 1);
                     break;
                 }
-                case R.id.button2:{
-                    Log.d("msg","near Address");
+                case R.id.button2: {
+                    Log.d("msg", "near Address");
                     FrameLayout fullFragment = findViewById(R.id.full_fragment_container);
                     fullFragment.setVisibility(View.VISIBLE);
                     SearchAddressFragment searchAddressFragment = new SearchAddressFragment();
@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity
                     transaction.addToBackStack(null);
                     break;
                 }
-                case R.id.button3:{
-                    Log.d("msg","That has");
+                case R.id.button3: {
+                    Log.d("msg", "That has");
                     stationListFragment = StationListFragment.newInstance(stations, "Current Location");
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
@@ -125,15 +125,16 @@ public class MainActivity extends AppCompatActivity
                 }
 
             }
-        }
-        else if(TAG.equals("ListFragment")){
+        } else if (TAG.equals("ListFragment")) {
             SearchThatHasFragment thatHasFragment = new SearchThatHasFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
             transaction.commit();
-        }
-        else if(TAG.equals("ThatHas")){
-            if(o instanceof  View) {
+        } else if (TAG.equals("DetailsFragment")) {
+            getSupportFragmentManager().popBackStack();
+            gMap.animateCamera((CameraUpdateFactory.zoomTo(13)));
+        } else if (TAG.equals("ThatHas")) {
+            if (o instanceof View) {
                 View view = (View) o;
                 switch (view.getId()) {
                     case R.id.closeBtn: {
@@ -197,29 +198,27 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
 
-                if(responseBody != null) {
+                if (responseBody != null) {
                     String response = new String(responseBody);
                     Gson gson = new GsonBuilder().create();
                     StationList stationList;
-                    try{
+                    try {
                         stationList = gson.fromJson(response, StationList.class);
                         stations = stationList.stations;
                         markMap(stations);
-                        if(flag==1){
+                        if (flag == 1) {
                             listReady.onListReady(stations);
-                        }
-                        else if(flag==2){
+                        } else if (flag == 2) {
                             stationListFragment = StationListFragment.newInstance(stationList.stations, location.getExtras().getString("address"));
                             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                             transaction.replace(R.id.fragment_container, stationListFragment).commit();
                             transaction.addToBackStack(null);
-                        }
-                        else{
+                        } else {
 
                         }
 
 
-                    } catch(JsonSyntaxException jse) {
+                    } catch (JsonSyntaxException jse) {
                         Log.d("jsonfail", jse.getMessage());
                     }
                 }
@@ -227,7 +226,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.d("httpfail", ""+statusCode);
+                Log.d("httpfail", "" + statusCode);
             }
         });
     }
@@ -243,29 +242,26 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Station station, int flag) {
-        if(flag == 1) {
+        if (flag == 1) {
             Uri gmmIntentUri = Uri.parse("google.navigation:q=" + station.lat + "," + station.lng);
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             mapIntent.setPackage("com.google.android.apps.maps");
             startActivity(mapIntent);
-        }
-        else if(flag == 2){
+        } else if (flag == 2) {
             gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)), 15));
             StationDetailsFragment detailFragment = StationDetailsFragment.newInstance(station);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, detailFragment).commit();
             transaction.addToBackStack(null);
-        }
-        else if(flag == 3){
+        } else if (flag == 3) {
             gMap.animateCamera((CameraUpdateFactory.newLatLngZoom(
                     new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)), 13)));
         }
     }
 
-    public void markMap(ArrayList<Station> stations){
-        gMap.clear();
-        for(Station station: stations){
+    public void markMap(ArrayList<Station> stations) {
+        for (Station station : stations) {
             gMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.techron_logo_lockup)));
@@ -286,9 +282,7 @@ public class MainActivity extends AppCompatActivity
             String results = getUrlContents(url);
             try {
                 JSONObject object = new JSONObject(results);
-                object = object.getJSONObject("result");
-                object = object.getJSONObject("geometry");
-                object = object.getJSONObject("location");
+                object = object.getJSONObject("result").getJSONObject("geometry").getJSONObject("location");
                 Location location = new Location("location");
                 LatLng latLng = new LatLng(object.getDouble("lat"), object.getDouble("lng"));
                 location.setLatitude(object.getDouble("lat"));
@@ -300,6 +294,7 @@ public class MainActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        gMap.clear();
                         gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                 latLng, 13));
                         gMap.addMarker(new MarkerOptions().position(latLng));
@@ -318,7 +313,7 @@ public class MainActivity extends AppCompatActivity
         private String makeUrl(String placeID) {
             StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
             urlString.append("placeid=" + placeID);
-            urlString.append("&sensor=true&key=" + KEY);
+            urlString.append("&key=" + KEY);
             return urlString.toString();
         }
 

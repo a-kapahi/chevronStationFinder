@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.chevron_stationfinder.models.Station;
@@ -27,7 +28,7 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
 
     private OnFragmentInteractionListener mListener;
     private Station station;
-    private String TAG = "DETAILS";
+    private String TAG = "DetailsFragment";
 
     public StationDetailsFragment() {
         // Required empty public constructor
@@ -65,6 +66,7 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
         TextView diesel = view.findViewById(R.id.diesel);
         TextView store = view.findViewById(R.id.store);
         TextView rewards = view.findViewById(R.id.rewards);
+        ImageButton close = view.findViewById(R.id.closeButton);
 
         diesel.setTextColor((Integer.valueOf(station.getDiesel()) == 0) ? Color.GRAY : Color.BLACK);
         carWash.setTextColor((Integer.valueOf(station.getCarwash()) == 0) ? Color.GRAY : Color.BLACK);
@@ -79,6 +81,7 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
         stationPhone.setText(station.getPhone());
         stationPhone.setOnClickListener(this);
         directions.setOnClickListener(this);
+        close.setOnClickListener(this);
         return view;
     }
 
@@ -115,6 +118,9 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
                 intent.setData(Uri.parse("tel:".concat(station.getPhone())));
                 startActivity(intent);
                 break;
+            }
+            case R.id.closeButton:{
+                mListener.onFragmentInteraction(TAG,v);
             }
         }
     }
