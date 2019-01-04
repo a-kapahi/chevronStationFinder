@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.chevron_stationfinder.models.Station;
@@ -33,6 +34,8 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     private MystationRecyclerViewAdapter recyclerViewAdapter;
     private TextView stationCount;
     private RecyclerView recyclerView;
+    private ProgressBar simpleProgressBar;
+    private boolean isLoading = true;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,7 +69,11 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         Context context = view.getContext();
         TextView address = view.findViewById(R.id.address);
         recyclerView = view.findViewById(R.id.list);
-        checkEmptyList();
+        simpleProgressBar = view.findViewById(R.id.progressBar);
+        if(isLoading) {
+            recyclerView.setVisibility(View.INVISIBLE);
+            simpleProgressBar.setVisibility(View.VISIBLE);
+        }
         SnapHelper helper = new LinearSnapHelper();
         helper.attachToRecyclerView(recyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
@@ -125,7 +132,9 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         stations.addAll(filteredStations);
         recyclerViewAdapter.notifyDataSetChanged();
         stationCount.setText(String.valueOf(stations.size()));
+        simpleProgressBar.setVisibility(View.GONE);
         checkEmptyList();
+        isLoading = false;
     }
 
     public void checkEmptyList() {

@@ -159,8 +159,9 @@ public class MainActivity extends AppCompatActivity
                     filteredStations.removeIf(s -> Integer.valueOf(s.getCarwash()) == 0);
                 if (filters[5] == 1)
                     filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
-                listReady.onListReady(filteredStations);
                 getSupportFragmentManager().popBackStack();
+                listReady.onListReady(filteredStations);
+
 
             }
         }
