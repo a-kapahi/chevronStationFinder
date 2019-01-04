@@ -36,6 +36,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     private RecyclerView recyclerView;
     private ProgressBar simpleProgressBar;
     private boolean isLoading = true;
+    private TextView addressText;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -67,7 +68,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_station_list, container, false);
         Context context = view.getContext();
-        TextView address = view.findViewById(R.id.address);
+        addressText = view.findViewById(R.id.address);
         recyclerView = view.findViewById(R.id.list);
         simpleProgressBar = view.findViewById(R.id.progressBar);
         if(isLoading) {
@@ -93,7 +94,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         Button optionsButton = view.findViewById(R.id.optionsBtn);
         optionsButton.setOnClickListener(this);
         stationCount.setText(String.valueOf(stations.size()));
-        address.setText(this.address);
+        addressText.setText(this.address);
         return view;
     }
 
@@ -135,6 +136,13 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         simpleProgressBar.setVisibility(View.GONE);
         checkEmptyList();
         isLoading = false;
+    }
+
+    @Override
+    public void changeAddressText(String address) {
+        this.address = address;
+        addressText.setText(this.address);
+
     }
 
     public void checkEmptyList() {

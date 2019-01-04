@@ -6,4 +6,6 @@ import java.util.ArrayList;
 
 public interface OnStationListReady {
     void onListReady(ArrayList<Station> stations);
+
+    void changeAddressText(String address);
 }

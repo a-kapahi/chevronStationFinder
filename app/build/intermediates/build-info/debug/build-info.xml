@@ -5,62 +5,36 @@
     build-mode="COLD"
     density="420dpi"
     format="10"
+    ir-eligibility="FIELD_ADDED"
     plugin-version="3.2.1"
-    timestamp="1545194198191"
+    timestamp="1546636460887"
     token="-6407731152370615315"
-    verifier="R_CLASS_CHANGE" >
+    verifier="COLD_SWAP_REQUESTED" >
 
     <task
         name="javac"
-        duration="12292" />
+        duration="428" />
     <task
         name="instant-run-dex"
         duration="0" />
     <task
         name="instant-run-transform"
-        duration="1366" />
+        duration="49" />
     <task
         name="verifier"
-        duration="745" />
+        duration="9" />
 
     <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\resources\instant-run\debug\resources-debug.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_1.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_2.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_0.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_3.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_4.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_5.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_7.apk"
-        type="SPLIT" />
-    <artifact
         location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_6.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_8.apk"
-        type="SPLIT" />
-    <artifact
-        location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
         type="SPLIT" />
 
     <build
         build-mode="FULL"
-        timestamp="1545172889991"
+        timestamp="1546628937013"
         verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\resources\instant-run\debug\resources-debug.apk"
+            type="SPLIT" />
         <artifact
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_0.apk"
             type="SPLIT" />
@@ -83,9 +57,6 @@
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
             type="SPLIT" />
         <artifact
-            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\resources\instant-run\debug\resources-debug.apk"
-            type="SPLIT" />
-        <artifact
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_3.apk"
             type="SPLIT" />
         <artifact
@@ -103,19 +74,20 @@
     </build>
     <build
         build-mode="COLD"
-        timestamp="1545194198191"
-        verifier="R_CLASS_CHANGE" >
+        ir-eligibility="R_CLASS_CHANGE"
+        timestamp="1546632681023"
+        verifier="COLD_SWAP_REQUESTED" >
         <artifact
-            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\resources\instant-run\debug\resources-debug.apk"
+            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
             type="SPLIT" />
         <artifact
-            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_1.apk"
+            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_0.apk"
             type="SPLIT" />
         <artifact
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_2.apk"
             type="SPLIT" />
         <artifact
-            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_0.apk"
+            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_1.apk"
             type="SPLIT" />
         <artifact
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_3.apk"
@@ -130,13 +102,24 @@
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_7.apk"
             type="SPLIT" />
         <artifact
-            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_6.apk"
-            type="SPLIT" />
-        <artifact
             location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_8.apk"
             type="SPLIT" />
+    </build>
+    <build
+        build-mode="COLD"
+        timestamp="1546634264877"
+        verifier="COLD_SWAP_REQUESTED" >
         <artifact
-            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_9.apk"
+            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\resources\instant-run\debug\resources-debug.apk"
+            type="SPLIT" />
+    </build>
+    <build
+        build-mode="COLD"
+        ir-eligibility="FIELD_ADDED"
+        timestamp="1546636460887"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="C:\Users\Abhishek\Documents\GitHub\chevronstationFinder\app\build\intermediates\split-apk\debug\slices\slice_6.apk"
             type="SPLIT" />
     </build>
 

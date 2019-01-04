@@ -102,10 +102,13 @@ public class MainActivity extends AppCompatActivity
                 }
                 case R.id.button2: {
                     Log.d("msg", "near Address");
+                    stationListFragment = StationListFragment.newInstance(stations, "Current Location");
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
                     FrameLayout fullFragment = findViewById(R.id.full_fragment_container);
                     fullFragment.setVisibility(View.VISIBLE);
                     SearchAddressFragment searchAddressFragment = new SearchAddressFragment();
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.full_fragment_container, searchAddressFragment);
                     transaction.commit();
                     transaction.addToBackStack(null);
@@ -210,10 +213,8 @@ public class MainActivity extends AppCompatActivity
                         if (flag == 1) {
                             listReady.onListReady(stations);
                         } else if (flag == 2) {
-                            stationListFragment = StationListFragment.newInstance(stationList.stations, location.getExtras().getString("address"));
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.fragment_container, stationListFragment).commit();
-                            transaction.addToBackStack(null);
+                            listReady.onListReady(stations);
+                            listReady.changeAddressText(location.getExtras().getString("address"));
                         } else {
 
                         }
