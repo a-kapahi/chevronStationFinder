@@ -5,6 +5,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".SearchFragment">
 
     <TextView
@@ -30,7 +31,7 @@
         android:background="@drawable/finder_button_pressed"
         android:drawableStart="@drawable/icon_near_by"
         android:drawablePadding="16dp"
-        android:elevation="8dp"
+        android:elevation="10dp"
         android:fontFamily="@font/roboto"
         android:gravity="left|center"
         android:padding="0dp"
@@ -52,7 +53,7 @@
         android:background="@drawable/finder_button_pressed"
         android:drawableStart="@drawable/icon_near_address"
         android:drawablePadding="16dp"
-        android:elevation="2dp"
+        android:elevation="10dp"
         android:fontFamily="@font/roboto"
         android:gravity="left|center"
         android:padding="0dp"
@@ -76,7 +77,7 @@
         android:background="@drawable/finder_button_pressed"
         android:drawableStart="@drawable/icon_that_have"
         android:drawablePadding="16dp"
-        android:elevation="2dp"
+        android:elevation="10dp"
         android:fontFamily="@font/roboto"
         android:gravity="left|center"
         android:padding="0dp"

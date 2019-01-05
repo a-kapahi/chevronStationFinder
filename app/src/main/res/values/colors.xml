@@ -9,7 +9,7 @@
     <color name="text_blue">#4a90e2</color>
     <color name="text_grey">#5e5e5e</color>
     <color name="text_lighter_grey">#7e7e7e</color>
-    <color name="text_dark_grey">#FF4C4C4C</color>
+    <color name="text_dark_grey">#4c4c4c</color>
     <color name="text_station_list_count_bg_grey">#dfdfdf</color>
 
 </resources>

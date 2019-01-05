@@ -1,6 +1,7 @@
 package com.example.chevron_stationfinder;
 
 import android.Manifest;
+import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -67,9 +68,11 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        FrameLayout f = findViewById(R.id.fragment_container);
+        f.getLayoutTransition().enableTransitionType(LayoutTransition.DISAPPEARING);
         SearchFragment searchFragment = new SearchFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, searchFragment).commit();
+                .add(R.id.fragment_container, searchFragment).addToBackStack(null).commit();
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
@@ -254,6 +257,7 @@ public class MainActivity extends AppCompatActivity
                     new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)), 15));
             StationDetailsFragment detailFragment = StationDetailsFragment.newInstance(station);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             transaction.replace(R.id.fragment_container, detailFragment).commit();
             transaction.addToBackStack(null);
         } else if (flag == 3) {
