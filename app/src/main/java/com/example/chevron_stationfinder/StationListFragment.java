@@ -37,6 +37,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     private ProgressBar simpleProgressBar;
     private boolean isLoading = true;
     private TextView addressText;
+    private TextView emptyText;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -71,9 +72,14 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         addressText = view.findViewById(R.id.address);
         recyclerView = view.findViewById(R.id.list);
         simpleProgressBar = view.findViewById(R.id.progressBar);
+        emptyText = view.findViewById(R.id.emptyText);
         if(isLoading) {
             recyclerView.setVisibility(View.INVISIBLE);
+            emptyText.setVisibility(View.GONE);
             simpleProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            simpleProgressBar.setVisibility(View.GONE);
+            checkEmptyList();
         }
         SnapHelper helper = new LinearSnapHelper();
         helper.attachToRecyclerView(recyclerView);
@@ -148,7 +154,12 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     public void checkEmptyList() {
         if (stations.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);
-        } else recyclerView.setVisibility(View.VISIBLE);
+            emptyText.setText("We couldn't find any stations near this location.");
+            emptyText.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**

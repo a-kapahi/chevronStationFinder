@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
                     filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
                 getSupportFragmentManager().popBackStack();
                 listReady.onListReady(filteredStations);
-
+                markMap(filteredStations);
 
             }
         }
@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void markMap(ArrayList<Station> stations) {
+        gMap.clear();
         for (Station station : stations) {
             gMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
