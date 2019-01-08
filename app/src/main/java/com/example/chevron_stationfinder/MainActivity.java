@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private OnStationListReady listReady;
     private StationListFragment stationListFragment;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity
         } else if (TAG.equals("ListFragment")) {
             SearchThatHasFragment thatHasFragment = new SearchThatHasFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.appear_anim, R.anim.disappear_anim, R.anim.appear_anim, R.anim.disappear_anim);
             transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
             transaction.commit();
         } else if (TAG.equals("DetailsFragment")) {
@@ -214,11 +216,7 @@ public class MainActivity extends AppCompatActivity
                         } else if (flag == 2) {
                             listReady.onListReady(stations);
                             listReady.changeAddressText(location.getExtras().getString("address"));
-                        } else {
-
                         }
-
-
                     } catch (JsonSyntaxException jse) {
                         Log.d("jsonfail", jse.getMessage());
                     }
@@ -253,7 +251,7 @@ public class MainActivity extends AppCompatActivity
                     new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)), 15));
             StationDetailsFragment detailFragment = StationDetailsFragment.newInstance(station);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.appear_anim, R.anim.appear_anim);
+            transaction.setCustomAnimations(R.anim.appear_anim, R.anim.disappear_anim, R.anim.appear_anim, R.anim.disappear_anim);
             transaction.replace(R.id.fragment_container, detailFragment).commit();
             transaction.addToBackStack(null);
         } else if (flag == 3) {

@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SnapHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,8 +79,8 @@ public class StationListFragment extends Fragment implements View.OnClickListene
             simpleProgressBar.setVisibility(View.GONE);
             checkEmptyList();
         }
-        SnapHelper helper = new LinearSnapHelper();
-        helper.attachToRecyclerView(recyclerView);
+        //SnapHelper helper = new LinearSnapHelper();
+        //helper.attachToRecyclerView(recyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerViewAdapter = new MystationRecyclerViewAdapter(stations, mListListener);

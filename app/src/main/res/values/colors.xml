@@ -11,5 +11,7 @@
     <color name="text_lighter_grey">#7e7e7e</color>
     <color name="text_dark_grey">#4c4c4c</color>
     <color name="text_station_list_count_bg_grey">#dfdfdf</color>
+    <color name="search_fragment_background">#d8f3f3f3</color>
+    <color name="prediction_list_bg">#d8f3f3f3</color>
 
 </resources>
