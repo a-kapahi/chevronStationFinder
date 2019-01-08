@@ -1,7 +1,9 @@
 package com.example.chevron_stationfinder;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     private GoogleMap gMap;
     private OnStationListReady listReady;
     private StationListFragment stationListFragment;
+    private SharedPreferences savedFilters;
+    private Integer[] filters;
 
 
     @Override
@@ -74,8 +78,20 @@ public class MainActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        savedFilters = this.getPreferences(Context.MODE_PRIVATE);
+        if (savedFilters.getInt("distance", 0) == 0) {
+            SharedPreferences.Editor editor = savedFilters.edit();
+            editor.putInt("distance", 35);
+            editor.putInt("hasCarWash", 0);
+            editor.putInt("hasExtraMile", 0);
+            editor.putInt("hasDiesel", 0);
+            editor.putInt("hasTapToPay", 0);
+            editor.putInt("hasCarWash", 0);
+            editor.putInt("hasGroceryRewards", 0);
+            editor.putInt("hasStore", 0);
+        }
+        filters = new Integer[]{savedFilters.getInt("hasExtraMile", 0), savedFilters.getInt("hasGroceryRewards", 0), savedFilters.getInt("hasStore", 0), savedFilters.getInt("hasTapToPay", 0), savedFilters.getInt("hasCarWash", 0), savedFilters.getInt("hasDiesel", 0), savedFilters.getInt("distance", 35)};
     }
 
     @Override
@@ -119,7 +135,7 @@ public class MainActivity extends AppCompatActivity
                     stationListFragment = StationListFragment.newInstance(stations, "Current Location");
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
-                    SearchThatHasFragment thatHasFragment = new SearchThatHasFragment();
+                    SearchThatHasFragment thatHasFragment = SearchThatHasFragment.newInstance(this.filters);
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
                     transaction.commit();
@@ -129,7 +145,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         } else if (TAG.equals("ListFragment")) {
-            SearchThatHasFragment thatHasFragment = new SearchThatHasFragment();
+            SearchThatHasFragment thatHasFragment = SearchThatHasFragment.newInstance(this.filters);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.setCustomAnimations(R.anim.appear_anim, R.anim.disappear_anim, R.anim.appear_anim, R.anim.disappear_anim);
             transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
@@ -148,28 +164,43 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (o instanceof Integer[]) {
                 Integer[] filters = (Integer[]) o;
-                ArrayList<Station> filteredStations = new ArrayList<>();
-                filteredStations.addAll(stations);
-                filteredStations.removeIf(s -> Float.valueOf(s.getDistance()) > filters[6]);
-                if (filters[0] == 1)
-                    filteredStations.removeIf(s -> Integer.valueOf(s.getExtramile()) == 0);
-                if (filters[1] == 1)
-                    filteredStations.removeIf(s -> Integer.valueOf(s.getLoyalty()) == 0);
-                if (filters[2] == 1)
-                    filteredStations.removeIf(s -> Integer.valueOf(s.getCstore()) == 0);
-                if (filters[3] == 1)
-                    filteredStations.removeIf(s -> Integer.valueOf(s.getNfc()) == 0);
-                if (filters[4] == 1)
-                    filteredStations.removeIf(s -> Integer.valueOf(s.getCarwash()) == 0);
-                if (filters[5] == 1)
-                    filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
+                this.filters = filters;
+                SharedPreferences.Editor editor = savedFilters.edit();
+                editor.putInt("distance", filters[6]);
+                editor.putInt("hasExtraMile", filters[0]);
+                editor.putInt("hasGroceryRewards", filters[1]);
+                editor.putInt("hasStore", filters[2]);
+                editor.putInt("hasTapToPay", filters[3]);
+                editor.putInt("hasCarWash", filters[4]);
+                editor.putInt("hasDiesel", filters[5]);
+                editor.commit();
                 getSupportFragmentManager().popBackStack();
+                ArrayList<Station> filteredStations = applyFilters(filters);
                 listReady.onListReady(filteredStations);
                 markMap(filteredStations);
 
             }
         }
 
+    }
+
+    public ArrayList<Station> applyFilters(Integer[] filters) {
+        ArrayList<Station> filteredStations = new ArrayList<>();
+        filteredStations.addAll(stations);
+        filteredStations.removeIf(s -> Float.valueOf(s.getDistance()) > filters[6]);
+        if (filters[0] == 1)
+            filteredStations.removeIf(s -> Integer.valueOf(s.getExtramile()) == 0);
+        if (filters[1] == 1)
+            filteredStations.removeIf(s -> Integer.valueOf(s.getLoyalty()) == 0);
+        if (filters[2] == 1)
+            filteredStations.removeIf(s -> Integer.valueOf(s.getCstore()) == 0);
+        if (filters[3] == 1)
+            filteredStations.removeIf(s -> Integer.valueOf(s.getNfc()) == 0);
+        if (filters[4] == 1)
+            filteredStations.removeIf(s -> Integer.valueOf(s.getCarwash()) == 0);
+        if (filters[5] == 1)
+            filteredStations.removeIf(s -> Integer.valueOf(s.getDiesel()) == 0);
+        return (filteredStations);
     }
 
     @Override
@@ -212,9 +243,9 @@ public class MainActivity extends AppCompatActivity
                         stations = stationList.stations;
                         markMap(stations);
                         if (flag == 1) {
-                            listReady.onListReady(stations);
+                            listReady.onListReady(applyFilters(filters));
                         } else if (flag == 2) {
-                            listReady.onListReady(stations);
+                            listReady.onListReady(applyFilters(filters));
                             listReady.changeAddressText(location.getExtras().getString("address"));
                         }
                     } catch (JsonSyntaxException jse) {
