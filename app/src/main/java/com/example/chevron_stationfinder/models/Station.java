@@ -41,10 +41,7 @@ public class Station implements Parcelable {
     private String giftcard;
     private String distance;
 
-    public Station() {
-    }
-
-    protected Station(Parcel in) {
+    private Station(Parcel in) {
         this.id = in.readString();
         this.name = in.readString();
         this.brand = in.readString();

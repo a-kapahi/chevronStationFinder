@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,7 +39,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
     private Integer distance;
     private ToggleButton diesel, carWash, store, tapToPay, extraMile, groceryRewards;
     private Spinner distanceSpinner;
-    private ArrayAdapter<CharSequence> adapter;
+    private Context mContext;
 
     public SearchThatHasFragment() {
         // Required empty public constructor
@@ -64,17 +65,17 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             distance = getArguments().getInt("distance");
-            hasDiesel = getArguments().getInt("hasDiesel") == 0 ? false : true;
-            hasTapToPay = getArguments().getInt("hasTapToPay") == 0 ? false : true;
-            hasExtraMile = getArguments().getInt("hasExtraMile") == 0 ? false : true;
-            hasCarWash = getArguments().getInt("hasCarWash") == 0 ? false : true;
-            hasStore = getArguments().getInt("hasStore") == 0 ? false : true;
-            hasGroceryRewards = getArguments().getInt("hasGroceryRewards") == 0 ? false : true;
+            hasDiesel = getArguments().getInt("hasDiesel") != 0;
+            hasTapToPay = getArguments().getInt("hasTapToPay") != 0;
+            hasExtraMile = getArguments().getInt("hasExtraMile") != 0;
+            hasCarWash = getArguments().getInt("hasCarWash") != 0;
+            hasStore = getArguments().getInt("hasStore") != 0;
+            hasGroceryRewards = getArguments().getInt("hasGroceryRewards") != 0;
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search_that_has, container, false);
@@ -89,7 +90,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
         TextView resetBtn = view.findViewById(R.id.resetBtn);
         resetBtn.setOnClickListener(this);
         distanceSpinner = view.findViewById(R.id.spinner);
-        adapter = ArrayAdapter.createFromResource(getContext(),
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
                 R.array.distance_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         distanceSpinner.setAdapter(adapter);
@@ -154,6 +155,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        mContext = context;
     }
 
     @Override
@@ -206,7 +208,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
         switch (compoundButton.getId()){
             case R.id.diesel: {
                 hasDiesel = b;
-                Drawable img = getContext().getResources().getDrawable(hasDiesel ? R.drawable.filter_icon_diesel_white : R.drawable.filter_icon_diesel_black);
+                Drawable img = mContext.getDrawable(hasDiesel ? R.drawable.filter_icon_diesel_white : R.drawable.filter_icon_diesel_black);
                 img.setBounds(0, 0, 100, 100);
                 compoundButton.setCompoundDrawables(null, img, null, null);
                 Log.d("diesel", String.valueOf(hasDiesel));
@@ -214,7 +216,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
             }
             case R.id.carWash: {
                 hasCarWash = b;
-                Drawable img = getContext().getResources().getDrawable(hasCarWash ? R.drawable.filter_icon_car_wash_white : R.drawable.filter_icon_car_wash_black);
+                Drawable img = mContext.getDrawable(hasCarWash ? R.drawable.filter_icon_car_wash_white : R.drawable.filter_icon_car_wash_black);
                 img.setBounds(0, 0, 100, 100);
                 compoundButton.setCompoundDrawables(null, img, null, null);
                 Log.d("car wash", String.valueOf(hasCarWash));
@@ -222,7 +224,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
             }
             case R.id.tapToPay: {
                 hasTapToPay = b;
-                Drawable img = getContext().getResources().getDrawable(hasTapToPay ? R.drawable.filter_icon_tap_to_pay_white : R.drawable.filter_icon_tap_to_pay_black);
+                Drawable img = mContext.getDrawable(hasTapToPay ? R.drawable.filter_icon_tap_to_pay_white : R.drawable.filter_icon_tap_to_pay_black);
                 img.setBounds(0, 0, 100, 100);
                 compoundButton.setCompoundDrawables(null, img, null, null);
                 Log.d("Tap to pay", String.valueOf(hasTapToPay));
@@ -230,7 +232,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
             }
             case R.id.store: {
                 hasStore = b;
-                Drawable img = getContext().getResources().getDrawable(hasStore ? R.drawable.filter_icon_store_white : R.drawable.filter_icon_store_black);
+                Drawable img = mContext.getDrawable(hasStore ? R.drawable.filter_icon_store_white : R.drawable.filter_icon_store_black);
                 img.setBounds(0, 0, 100, 100);
                 compoundButton.setCompoundDrawables(null, img, null, null);
                 Log.d("Store", String.valueOf(hasStore));
@@ -238,7 +240,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
             }
             case R.id.groceryRewards: {
                 hasGroceryRewards = b;
-                Drawable img = getContext().getResources().getDrawable(hasGroceryRewards ? R.drawable.filter_icon_grocery_rewards_white : R.drawable.filter_icon_grocery_rewards_black);
+                Drawable img = mContext.getDrawable(hasGroceryRewards ? R.drawable.filter_icon_grocery_rewards_white : R.drawable.filter_icon_grocery_rewards_black);
                 img.setBounds(0, 0, 100, 100);
                 compoundButton.setCompoundDrawables(null, img, null, null);
                 Log.d("Grocery rewards", String.valueOf(hasGroceryRewards));
@@ -246,7 +248,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
             }
             case R.id.extraMile: {
                 hasExtraMile = b;
-                Drawable img = getContext().getResources().getDrawable(hasExtraMile ? R.drawable.filter_icon_extramile_white : R.drawable.filter_icon_extramile_black);
+                Drawable img = mContext.getDrawable(hasExtraMile ? R.drawable.filter_icon_extramile_white : R.drawable.filter_icon_extramile_black);
                 img.setBounds(0, 0, 100, 100);
                 compoundButton.setCompoundDrawables(null, img, null, null);
                 Log.d("Extra mile", String.valueOf(hasExtraMile));

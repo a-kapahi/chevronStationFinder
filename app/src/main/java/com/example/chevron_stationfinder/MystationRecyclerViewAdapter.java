@@ -1,6 +1,7 @@
 package com.example.chevron_stationfinder;
 
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,52 +24,39 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
     private final ArrayList<Station> stations;
     private final OnListFragmentInteractionListener mListener;
 
-    public MystationRecyclerViewAdapter(ArrayList<Station> items, OnListFragmentInteractionListener listener) {
+    MystationRecyclerViewAdapter(ArrayList<Station> items, OnListFragmentInteractionListener listener) {
         stations = items;
         mListener = listener;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_station_list_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.station = stations.get(position);
         holder.stationName.setText(stations.get(position).getName());
         holder.stationAddress.setText(stations.get(position).getAddress());
         holder.distance.setText(stations.get(position).getDistance().substring(0,3).concat(" Mi"));
-        holder.amenities.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.amenities.getLayoutParams();
-                if(holder.amenitiesLayout.getVisibility()==View.VISIBLE) {
-                    holder.amenitiesLayout.setVisibility(View.GONE);
-                    params.topToBottom = holder.distance.getId();
-                }
-                else{
-                    holder.amenitiesLayout.setVisibility(View.VISIBLE);
-                    params.topToBottom = holder.amenitiesLayout.getId();
-                    setAmenities(holder);
-                }
-            }
-        });
-        holder.directions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onListFragmentInteraction(holder.station, 1);
+        holder.amenities.setOnClickListener(view -> {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.amenities.getLayoutParams();
+            if (holder.amenitiesLayout.getVisibility() == View.VISIBLE) {
+                holder.amenitiesLayout.setVisibility(View.GONE);
+                params.topToBottom = holder.distance.getId();
+            } else {
+                holder.amenitiesLayout.setVisibility(View.VISIBLE);
+                params.topToBottom = holder.amenitiesLayout.getId();
+                setAmenities(holder);
             }
         });
 
-        holder.details.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onListFragmentInteraction(holder.station, 2);
-            }
-        });
+        holder.directions.setOnClickListener(view -> mListener.onListFragmentInteraction(holder.station, 1));
+        holder.details.setOnClickListener(view -> mListener.onListFragmentInteraction(holder.station, 2));
     }
 
     private void setAmenities(ViewHolder holder) {
@@ -86,23 +74,23 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
+        final View mView;
         public final TextView stationName;
         public final TextView stationAddress;
         public final TextView distance;
         public final ConstraintLayout amenitiesLayout;
-        public final TextView amenities;
-        public final TextView directions;
-        public final TextView details;
+        final TextView amenities;
+        final TextView directions;
+        final TextView details;
         public final TextView extraMile;
         public final TextView tapToPay;
         public final TextView carWash;
         public final TextView diesel;
         public final TextView store;
         public final TextView rewards;
-        public Station station;
+        Station station;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             stationName = view.findViewById(R.id.stationName);

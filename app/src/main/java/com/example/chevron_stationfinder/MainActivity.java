@@ -30,7 +30,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -51,14 +50,13 @@ import cz.msebera.android.httpclient.Header;
 public class MainActivity extends AppCompatActivity
         implements OnFragmentInteractionListener, OnMapReadyCallback, StationListFragment.OnListFragmentInteractionListener, SearchAddressFragment.OnListFragmentInteractionListener {
 
-    public static final String RELATIVE_URL_FOR_NEAR_ME = "ws_getChevronTexacoNearMe_r2.aspx"; // "GetChevronWithTechronNearMe.aspx";
+    private static final String RELATIVE_URL_FOR_NEAR_ME = "ws_getChevronTexacoNearMe_r2.aspx"; // "GetChevronWithTechronNearMe.aspx";
     private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
     private FusedLocationProviderClient mFusedLocationClient;
     private Location loc;
     private ArrayList<Station> stations;
     private GoogleMap gMap;
     private OnStationListReady listReady;
-    private StationListFragment stationListFragment;
     private SharedPreferences savedFilters;
     private Integer[] filters;
 
@@ -106,6 +104,7 @@ public class MainActivity extends AppCompatActivity
     public void onFragmentInteraction(String TAG, Object o) {
         if (TAG.equals("SearchFragment")) {
             View view = (View) o;
+            StationListFragment stationListFragment;
             switch (view.getId()) {
                 case R.id.button: {
                     Log.d("msg", "Nearby presssed");
@@ -185,8 +184,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public ArrayList<Station> applyFilters(Integer[] filters) {
-        ArrayList<Station> filteredStations = new ArrayList<>();
-        filteredStations.addAll(stations);
+        ArrayList<Station> filteredStations = new ArrayList<>(stations);
         filteredStations.removeIf(s -> Float.valueOf(s.getDistance()) > filters[6]);
         if (filters[0] == 1)
             filteredStations.removeIf(s -> Integer.valueOf(s.getExtramile()) == 0);
@@ -211,18 +209,15 @@ public class MainActivity extends AppCompatActivity
                     1);
         }
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            loc = location;
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(location.getLatitude(),
-                                            location.getLongitude()), 13));
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
-                                    location.getLongitude())));
-                        }
+                .addOnSuccessListener(this, location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        loc = location;
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(),
+                                        location.getLongitude()), 13));
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
+                                location.getLongitude())));
                     }
                 });
         gMap = mMap;
@@ -323,16 +318,13 @@ public class MainActivity extends AppCompatActivity
                 extra.putString("address", strings[1]);
                 location.setExtras(extra);
                 Log.d("result", object.toString());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        gMap.clear();
-                        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                latLng, 13));
-                        gMap.addMarker(new MarkerOptions().position(latLng));
-                        getSupportFragmentManager().popBackStack();
-                        getNearbyStations(location, 2);
-                    }
+                runOnUiThread(() -> {
+                    gMap.clear();
+                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            latLng, 13));
+                    gMap.addMarker(new MarkerOptions().position(latLng));
+                    getSupportFragmentManager().popBackStack();
+                    getNearbyStations(location, 2);
                 });
 
 
@@ -343,10 +335,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         private String makeUrl(String placeID) {
-            StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
-            urlString.append("placeid=" + placeID);
-            urlString.append("&key=" + KEY);
-            return urlString.toString();
+            String urlString = "https://maps.googleapis.com/maps/api/place/details/json?" + "placeid=" + placeID +
+                    "&key=" + KEY;
+            return urlString;
         }
 
         private String getUrlContents(String theUrl) {
@@ -357,7 +348,7 @@ public class MainActivity extends AppCompatActivity
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    content.append(line + "\n");
+                    content.append(line).append("\n");
                 }
                 bufferedReader.close();
             } catch (Exception e) {

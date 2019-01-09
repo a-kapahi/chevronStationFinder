@@ -3,8 +3,8 @@ package com.example.chevron_stationfinder;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,14 +38,11 @@ import java.util.ArrayList;
  */
 public class SearchAddressFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private ArrayList<Prediction> predictions;
     private PredictionListAdapter recyclerViewAdapter;
+    private Context mContext;
 
 
     /**
@@ -55,45 +52,30 @@ public class SearchAddressFragment extends Fragment {
     public SearchAddressFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static SearchAddressFragment newInstance(int columnCount) {
-        SearchAddressFragment fragment = new SearchAddressFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
+    public static SearchAddressFragment newInstance() {
+        return new SearchAddressFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
         predictions = new ArrayList<>();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_prediction_list, container, false);
         EditText address = view.findViewById(R.id.address);
         RecyclerView recyclerView = view.findViewById(R.id.prediction_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerViewAdapter = new PredictionListAdapter(predictions, mListener);
-        DividerItemDecoration itemDecorator = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        itemDecorator.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(mContext.getDrawable(R.drawable.list_divider));
         recyclerView.addItemDecoration(itemDecorator);
         recyclerView.setAdapter(recyclerViewAdapter);
         ImageButton clearButton = view.findViewById(R.id.clearButton);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                address.getText().clear();
-            }
-        });
+        clearButton.setOnClickListener(view1 -> address.getText().clear());
         address.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -123,6 +105,7 @@ public class SearchAddressFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+        mContext = context;
     }
 
     @Override
@@ -144,7 +127,6 @@ public class SearchAddressFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(Prediction item);
     }
 
@@ -165,13 +147,7 @@ public class SearchAddressFragment extends Fragment {
                     Log.d(String.valueOf(f.get("description")), String.valueOf(f.get("place_id")));
                     predictions.add(new Prediction(String.valueOf(f.get("description")), String.valueOf(f.get("place_id"))));
                 }
-                getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        recyclerViewAdapter.notifyDataSetChanged();
-                    }
-                });
+                getActivity().runOnUiThread(() -> recyclerViewAdapter.notifyDataSetChanged());
 
             } catch (JSONException e) {
                 Log.e("ERROR", "Unable to parse JSON");
@@ -180,13 +156,12 @@ public class SearchAddressFragment extends Fragment {
         }
 
         private String makeUrl(String searchTerm) {
-            StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/place/autocomplete/json?");
 
-            urlString.append("input=" + searchTerm);
-            urlString.append("&types=geocode");
-            urlString.append("&components=country:us");
-            urlString.append("&sensor=true&key=" + KEY);
-            return urlString.toString().replaceAll(" ", "+");
+            String urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?" + "input=" + searchTerm +
+                    "&types=geocode" +
+                    "&components=country:us" +
+                    "&sensor=true&key=" + KEY;
+            return urlString.replaceAll(" ", "+");
         }
 
         private String getUrlContents(String theUrl) {
@@ -197,7 +172,7 @@ public class SearchAddressFragment extends Fragment {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    content.append(line + "\n");
+                    content.append(line).append("\n");
                 }
                 bufferedReader.close();
             } catch (Exception e) {
