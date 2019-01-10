@@ -1,7 +1,6 @@
 package com.example.chevron_stationfinder;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,17 +16,18 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import com.example.chevron_stationfinder.PlacesAPI.PlacesAPIUtils;
 import com.example.chevron_stationfinder.models.Prediction;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -84,7 +83,7 @@ public class SearchAddressFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                new GetPredictions().execute(String.valueOf(charSequence));
+                getPredictions(String.valueOf(charSequence));
             }
 
             @Override
@@ -130,59 +129,32 @@ public class SearchAddressFragment extends Fragment {
         void onListFragmentInteraction(Prediction item);
     }
 
-
-    private class GetPredictions extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            String url = makeUrl(strings[0]);
-            String results = getUrlContents(url);
-            try {
-                JSONObject object = new JSONObject(results);
-                JSONArray array = object.getJSONArray("predictions");
-                Log.d("predictions", String.valueOf(array.length()));
-                predictions.clear();
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject f = (JSONObject) array.get(i);
-                    Log.d(String.valueOf(f.get("description")), String.valueOf(f.get("place_id")));
-                    predictions.add(new Prediction(String.valueOf(f.get("description")), String.valueOf(f.get("place_id"))));
+    private void getPredictions(String searchTerm) {
+        Map<String, String> params = new HashMap<>();
+        params.put("input", searchTerm);
+        params.put("types, ", "geocode");
+        params.put("components", "country:us");
+        params.put("sensor", "true");
+        params.put("key", KEY);
+        Call<JsonObject> call = PlacesAPIUtils.getPlacesService().getPlaces(params);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    JsonObject object = response.body();
+                    JsonArray array = object.getAsJsonArray("predictions");
+                    predictions.clear();
+                    array.iterator().forEachRemaining(jsonElement -> predictions.add(new Prediction(jsonElement.getAsJsonObject().get("description").getAsString(), jsonElement.getAsJsonObject().get("place_id").getAsString())));
+                    recyclerViewAdapter.notifyDataSetChanged();
                 }
-                getActivity().runOnUiThread(() -> recyclerViewAdapter.notifyDataSetChanged());
-
-            } catch (JSONException e) {
-                Log.e("ERROR", "Unable to parse JSON");
             }
-            return null;
-        }
 
-        private String makeUrl(String searchTerm) {
+            @Override
+            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
 
-            String urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?" + "input=" + searchTerm +
-                    "&types=geocode" +
-                    "&components=country:us" +
-                    "&sensor=true&key=" + KEY;
-            return urlString.replaceAll(" ", "+");
-        }
-
-        private String getUrlContents(String theUrl) {
-            StringBuilder content = new StringBuilder();
-            try {
-                URL url = new URL(theUrl);
-                URLConnection urlConnection = url.openConnection();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    content.append(line).append("\n");
-                }
-                bufferedReader.close();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-            return content.toString();
-        }
+        });
     }
-
-
 
 
 }

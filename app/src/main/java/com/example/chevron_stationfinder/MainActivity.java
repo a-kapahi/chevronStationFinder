@@ -7,8 +7,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.example.chevron_stationfinder.APIs.APIUtils;
+import com.example.chevron_stationfinder.PlacesAPI.PlacesAPIUtils;
 import com.example.chevron_stationfinder.models.Prediction;
 import com.example.chevron_stationfinder.models.Station;
 import com.example.chevron_stationfinder.models.StationList;
@@ -30,22 +32,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.google.gson.JsonObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import cz.msebera.android.httpclient.Header;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements OnFragmentInteractionListener, OnMapReadyCallback, StationListFragment.OnListFragmentInteractionListener, SearchAddressFragment.OnListFragmentInteractionListener {
@@ -112,7 +107,10 @@ public class MainActivity extends AppCompatActivity
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).commit();
                     transaction.addToBackStack(null);
-                    getNearbyStations(loc, 1);
+                    Bundle extra = new Bundle();
+                    extra.putString("address", "Current Location");
+                    loc.setExtras(extra);
+                    getNearbyStations(loc);
                     break;
                 }
                 case R.id.button2: {
@@ -138,7 +136,7 @@ public class MainActivity extends AppCompatActivity
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, thatHasFragment).addToBackStack(null);
                     transaction.commit();
-                    getNearbyStations(loc, 1);
+                    getNearbyStations(loc);
                     break;
                 }
 
@@ -223,45 +221,35 @@ public class MainActivity extends AppCompatActivity
         gMap = mMap;
     }
 
-    private void getNearbyStations(final Location location, final int flag) {
+    private void getNearbyStations(final Location location) {
 
-        AsyncHttpClient.get(RELATIVE_URL_FOR_NEAR_ME, getParams(location), new AsyncHttpResponseHandler() {
+        Call<StationList> call = APIUtils.getStationService().getStations(getParams(location));
+        call.enqueue(new Callback<StationList>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-
-                if (responseBody != null) {
-                    String response = new String(responseBody);
-                    Gson gson = new GsonBuilder().create();
-                    StationList stationList;
-                    try {
-                        stationList = gson.fromJson(response, StationList.class);
-                        stations = stationList.stations;
-                        markMap(stations);
-                        if (flag == 1) {
-                            listReady.onListReady(applyFilters(filters));
-                        } else if (flag == 2) {
-                            listReady.onListReady(applyFilters(filters));
-                            listReady.changeAddressText(location.getExtras().getString("address"));
-                        }
-                    } catch (JsonSyntaxException jse) {
-                        Log.d("jsonfail", jse.getMessage());
+            public void onResponse(@NonNull Call<StationList> call, @NonNull Response<StationList> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        stations = response.body().stations;
                     }
+                    markMap(stations);
+                    listReady.onListReady(applyFilters(filters));
+                    listReady.changeAddressText(location.getExtras().getString("address"));
                 }
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.d("httpfail", "" + statusCode);
+            public void onFailure(@NonNull Call<StationList> call, @NonNull Throwable t) {
+                Log.d("Error", t.getMessage());
             }
         });
     }
 
-    private RequestParams getParams(Location location) {
-        RequestParams params = new RequestParams();
+    private Map<String, String> getParams(Location location) {
+        Map<String, String> params = new HashMap<>();
         params.put("lat", String.valueOf(location.getLatitude()));
         params.put("lng", String.valueOf(location.getLongitude()));
         params.put("brand", "ChevronTexaco");
-        params.put("radius", 35);
+        params.put("radius", String.valueOf(35));
         return params;
     }
 
@@ -297,64 +285,41 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Prediction item) {
-        new GetPredictionLatLng().execute(item.getPlace_id(), item.getDescription());
-    }
-
-
-    private class GetPredictionLatLng extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String url = makeUrl(strings[0]);
-            String results = getUrlContents(url);
-            try {
-                JSONObject object = new JSONObject(results);
-                object = object.getJSONObject("result").getJSONObject("geometry").getJSONObject("location");
-                Location location = new Location("location");
-                LatLng latLng = new LatLng(object.getDouble("lat"), object.getDouble("lng"));
-                location.setLatitude(object.getDouble("lat"));
-                location.setLongitude(object.getDouble("lng"));
-                Bundle extra = new Bundle();
-                extra.putString("address", strings[1]);
-                location.setExtras(extra);
-                Log.d("result", object.toString());
-                runOnUiThread(() -> {
+        Map<String, String> params = new HashMap<>();
+        params.put("placeid", item.getPlace_id());
+        params.put("key", KEY);
+        Call<JsonObject> call = PlacesAPIUtils.getPlacesService().getPlaceDetails(params);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    JsonObject object = response.body().getAsJsonObject("result").getAsJsonObject("geometry").getAsJsonObject("location");
+                    Location location = new Location("location");
+                    Double lat, lng;
+                    lat = object.get("lat").getAsDouble();
+                    lng = object.get("lng").getAsDouble();
+                    LatLng latLng = new LatLng(lat, lng);
+                    location.setLatitude(lat);
+                    location.setLongitude(lng);
+                    Bundle extra = new Bundle();
+                    extra.putString("address", item.getDescription());
+                    location.setExtras(extra);
+                    Log.d("result", object.toString());
                     gMap.clear();
                     gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                             latLng, 13));
                     gMap.addMarker(new MarkerOptions().position(latLng));
                     getSupportFragmentManager().popBackStack();
-                    getNearbyStations(location, 2);
-                });
-
-
-            } catch (JSONException e) {
-                Log.e("ERROR", "Unable to parse JSON");
-            }
-            return null;
-        }
-
-        private String makeUrl(String placeID) {
-            String urlString = "https://maps.googleapis.com/maps/api/place/details/json?" + "placeid=" + placeID +
-                    "&key=" + KEY;
-            return urlString;
-        }
-
-        private String getUrlContents(String theUrl) {
-            StringBuilder content = new StringBuilder();
-            try {
-                URL url = new URL(theUrl);
-                URLConnection urlConnection = url.openConnection();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    content.append(line).append("\n");
+                    getNearbyStations(location);
                 }
-                bufferedReader.close();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-            return content.toString();
-        }
+
+            @Override
+            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+
+            }
+        });
+
     }
+
 }
