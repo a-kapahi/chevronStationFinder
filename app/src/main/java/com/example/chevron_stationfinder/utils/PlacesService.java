@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder.PlacesAPI;
+package com.example.chevron_stationfinder.utils;
 
 import com.google.gson.JsonObject;
 

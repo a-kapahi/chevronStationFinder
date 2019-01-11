@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.interfaces;
 
 
 public interface OnFragmentInteractionListener {

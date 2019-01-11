@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.chevron_stationfinder.R;
+import com.example.chevron_stationfinder.interfaces.OnFragmentInteractionListener;
 import com.example.chevron_stationfinder.models.Station;
 
 

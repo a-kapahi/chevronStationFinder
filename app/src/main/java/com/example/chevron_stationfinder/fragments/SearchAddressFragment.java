@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,8 +16,10 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
-import com.example.chevron_stationfinder.PlacesAPI.PlacesAPIUtils;
+import com.example.chevron_stationfinder.R;
+import com.example.chevron_stationfinder.adapters.PredictionListAdapter;
 import com.example.chevron_stationfinder.models.Prediction;
+import com.example.chevron_stationfinder.utils.PlacesAPIUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 

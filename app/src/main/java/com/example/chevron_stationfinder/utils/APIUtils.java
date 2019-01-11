@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder.APIs;
+package com.example.chevron_stationfinder.utils;
 
 public class APIUtils {
 

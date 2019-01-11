@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.fragments;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -17,6 +17,9 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import com.example.chevron_stationfinder.R;
+import com.example.chevron_stationfinder.interfaces.OnFragmentInteractionListener;
 
 
 /**
@@ -115,6 +118,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
         groceryRewards.setChecked(hasGroceryRewards);
         extraMile.setChecked(hasExtraMile);
 
+
         switch (distance) {
             case 1:
                 distanceSpinner.setSelection(0);
@@ -192,6 +196,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        ((TextView) parent.getChildAt(0)).setTextColor(mContext.getColor(R.color.colorAccent));
         String distance = (String)parent.getItemAtPosition(pos);
         this.distance = Integer.valueOf(distance.substring(0, 2).trim());
         Log.d("Spinner selected", this.distance + "miles");

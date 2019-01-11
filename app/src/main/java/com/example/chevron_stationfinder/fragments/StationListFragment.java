@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +14,10 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.chevron_stationfinder.R;
+import com.example.chevron_stationfinder.adapters.MystationRecyclerViewAdapter;
+import com.example.chevron_stationfinder.interfaces.OnFragmentInteractionListener;
+import com.example.chevron_stationfinder.interfaces.OnStationListReady;
 import com.example.chevron_stationfinder.models.Station;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.adapters;
 
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -9,7 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.chevron_stationfinder.StationListFragment.OnListFragmentInteractionListener;
+import com.example.chevron_stationfinder.R;
+import com.example.chevron_stationfinder.fragments.StationListFragment.OnListFragmentInteractionListener;
 import com.example.chevron_stationfinder.models.Station;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
     private final ArrayList<Station> stations;
     private final OnListFragmentInteractionListener mListener;
 
-    MystationRecyclerViewAdapter(ArrayList<Station> items, OnListFragmentInteractionListener listener) {
+    public MystationRecyclerViewAdapter(ArrayList<Station> items, OnListFragmentInteractionListener listener) {
         stations = items;
         mListener = listener;
     }

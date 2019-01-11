@@ -1,9 +1,9 @@
-package com.example.chevron_stationfinder.PlacesAPI;
+package com.example.chevron_stationfinder.utils;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-class PlacesRetrofitClient {
+class RetrofitClient {
 
     private static Retrofit retrofit = null;
 

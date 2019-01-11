@@ -18,11 +18,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.example.chevron_stationfinder.APIs.APIUtils;
-import com.example.chevron_stationfinder.PlacesAPI.PlacesAPIUtils;
+import com.example.chevron_stationfinder.fragments.SearchAddressFragment;
+import com.example.chevron_stationfinder.fragments.SearchFragment;
+import com.example.chevron_stationfinder.fragments.SearchThatHasFragment;
+import com.example.chevron_stationfinder.fragments.StationDetailsFragment;
+import com.example.chevron_stationfinder.fragments.StationListFragment;
+import com.example.chevron_stationfinder.interfaces.OnFragmentInteractionListener;
+import com.example.chevron_stationfinder.interfaces.OnStationListReady;
 import com.example.chevron_stationfinder.models.Prediction;
 import com.example.chevron_stationfinder.models.Station;
 import com.example.chevron_stationfinder.models.StationList;
+import com.example.chevron_stationfinder.utils.APIUtils;
+import com.example.chevron_stationfinder.utils.PlacesAPIUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,14 +38,12 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -108,6 +113,9 @@ public class MainActivity extends AppCompatActivity
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         loc = location;
+                        Bundle extra = new Bundle();
+                        extra.putString("address", "Current Location");
+                        loc.setExtras(extra);
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(location.getLatitude(),
                                         location.getLongitude()), 13));
@@ -116,19 +124,13 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
         gMap = mMap;
-        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                stations.iterator().forEachRemaining(new Consumer<Station>() {
-                    @Override
-                    public void accept(Station station) {
-                        if (marker.getPosition().latitude == Double.valueOf(station.lat) && marker.getPosition().longitude == Double.valueOf(station.lng)) {
-                            listReady.scrollToStation(station);
-                        }
-                    }
-                });
-                return false;
-            }
+        gMap.setOnMarkerClickListener(marker -> {
+            stations.iterator().forEachRemaining(station -> {
+                if (marker.getPosition().latitude == Double.valueOf(station.lat) && marker.getPosition().longitude == Double.valueOf(station.lng)) {
+                    listReady.scrollToStation(station);
+                }
+            });
+            return false;
         });
     }
 
@@ -186,9 +188,6 @@ public class MainActivity extends AppCompatActivity
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).commit();
                     transaction.addToBackStack(null);
-                    Bundle extra = new Bundle();
-                    extra.putString("address", "Current Location");
-                    loc.setExtras(extra);
                     getNearbyStations(loc);
                     break;
                 }

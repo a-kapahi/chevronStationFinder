@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder.APIs;
+package com.example.chevron_stationfinder.utils;
 
 
 import com.example.chevron_stationfinder.models.StationList;

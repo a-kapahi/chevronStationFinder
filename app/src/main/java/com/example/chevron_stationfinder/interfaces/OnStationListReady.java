@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.interfaces;
 
 import com.example.chevron_stationfinder.models.Station;
 

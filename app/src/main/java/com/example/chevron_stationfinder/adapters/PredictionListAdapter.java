@@ -1,4 +1,4 @@
-package com.example.chevron_stationfinder;
+package com.example.chevron_stationfinder.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.chevron_stationfinder.SearchAddressFragment.OnListFragmentInteractionListener;
+import com.example.chevron_stationfinder.R;
+import com.example.chevron_stationfinder.fragments.SearchAddressFragment.OnListFragmentInteractionListener;
 import com.example.chevron_stationfinder.models.Prediction;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class PredictionListAdapter extends RecyclerView.Adapter<PredictionListAd
     private final ArrayList<Prediction> predictions;
     private final OnListFragmentInteractionListener mListener;
 
-    PredictionListAdapter(ArrayList<Prediction> items, OnListFragmentInteractionListener listener) {
+    public PredictionListAdapter(ArrayList<Prediction> items, OnListFragmentInteractionListener listener) {
         predictions = items;
         mListener = listener;
     }
