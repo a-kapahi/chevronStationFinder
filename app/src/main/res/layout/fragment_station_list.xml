@@ -17,7 +17,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:fontFamily="@font/roboto"
-        android:text="Stations near :"
+        android:text="@string/stations_near_text"
         android:typeface="sans"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +45,7 @@
         android:drawablePadding="4dp"
         android:fontFamily="sans-serif"
         android:padding="2dp"
-        android:text="Options"
+        android:text="@string/options_button_text"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         android:textSize="14sp"
@@ -60,7 +60,6 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/grey_circle"
         android:gravity="center"
-        android:text="25"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="14sp"
@@ -73,7 +72,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
-        android:text="Current Location"
         app:layout_constraintStart_toEndOf="@+id/stationCount"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 

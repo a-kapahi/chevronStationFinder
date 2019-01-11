@@ -8,4 +8,6 @@ public interface OnStationListReady {
     void onListReady(ArrayList<Station> stations);
 
     void changeAddressText(String address);
+
+    void scrollToStation(Station station);
 }

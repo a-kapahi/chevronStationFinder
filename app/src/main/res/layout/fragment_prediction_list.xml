@@ -29,6 +29,7 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginStart="8dp"
+            android:contentDescription="@string/search_icon_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/address"
             app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +46,7 @@
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
             android:fontFamily="@font/roboto"
-            android:hint="Search"
+            android:hint="@string/search_bar_text"
             android:inputType="text|textPersonName"
             android:selectAllOnFocus="true"
             android:textColor="@android:color/black"
@@ -53,6 +54,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/clearButton"
             app:layout_constraintStart_toEndOf="@+id/search_icon"
+            android:importantForAutofill="no"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
@@ -61,6 +63,7 @@
             android:layout_height="20dp"
             android:background="@android:color/transparent"
             android:clickable="true"
+            android:contentDescription="@string/clear_button_description"
             android:padding="1.5dp"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"

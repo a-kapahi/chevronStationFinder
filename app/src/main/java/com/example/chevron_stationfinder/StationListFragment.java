@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     private boolean isLoading = true;
     private TextView addressText;
     private TextView emptyText;
+    private Context mContext;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -79,8 +81,6 @@ public class StationListFragment extends Fragment implements View.OnClickListene
             simpleProgressBar.setVisibility(View.GONE);
             checkEmptyList();
         }
-        //SnapHelper helper = new LinearSnapHelper();
-        //helper.attachToRecyclerView(recyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerViewAdapter = new MystationRecyclerViewAdapter(stations, mListListener);
@@ -113,6 +113,7 @@ public class StationListFragment extends Fragment implements View.OnClickListene
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+        mContext = context;
     }
 
     @Override
@@ -147,6 +148,19 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         this.address = address;
         addressText.setText(this.address);
 
+    }
+
+    @Override
+    public void scrollToStation(Station station) {
+        RecyclerView.SmoothScroller smoothScroller = new
+                LinearSmoothScroller(mContext) {
+                    @Override
+                    protected int getVerticalSnapPreference() {
+                        return LinearSmoothScroller.SNAP_TO_START;
+                    }
+                };
+        smoothScroller.setTargetPosition(stations.indexOf(station));
+        recyclerView.getLayoutManager().startSmoothScroll(smoothScroller);
     }
 
     public void checkEmptyList() {

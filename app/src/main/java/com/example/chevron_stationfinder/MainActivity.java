@@ -31,12 +31,14 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,7 +47,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements OnFragmentInteractionListener, OnMapReadyCallback, StationListFragment.OnListFragmentInteractionListener, SearchAddressFragment.OnListFragmentInteractionListener {
 
-    private static final String RELATIVE_URL_FOR_NEAR_ME = "ws_getChevronTexacoNearMe_r2.aspx"; // "GetChevronWithTechronNearMe.aspx";
     private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
     private FusedLocationProviderClient mFusedLocationClient;
     private Location loc;
@@ -94,6 +95,84 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
+    @Override
+    public void onMapReady(final GoogleMap mMap) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        loc = location;
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(),
+                                        location.getLongitude()), 13));
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
+                                location.getLongitude())));
+                    }
+                });
+        gMap = mMap;
+        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                stations.iterator().forEachRemaining(new Consumer<Station>() {
+                    @Override
+                    public void accept(Station station) {
+                        if (marker.getPosition().latitude == Double.valueOf(station.lat) && marker.getPosition().longitude == Double.valueOf(station.lng)) {
+                            listReady.scrollToStation(station);
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+    }
+
+    public void markMap(ArrayList<Station> stations) {
+        gMap.clear();
+        gMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())));
+        for (Station station : stations) {
+            gMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.techron_logo_lockup)));
+        }
+    }
+
+    private void getNearbyStations(final Location location) {
+
+        Call<StationList> call = APIUtils.getStationService().getStations(getParams(location));
+        call.enqueue(new Callback<StationList>() {
+            @Override
+            public void onResponse(@NonNull Call<StationList> call, @NonNull Response<StationList> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        stations = response.body().stations;
+                    }
+                    markMap(stations);
+                    listReady.onListReady(applyFilters(filters));
+                    listReady.changeAddressText(location.getExtras().getString("address"));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<StationList> call, @NonNull Throwable t) {
+                Log.d("Error", t.getMessage());
+            }
+        });
+    }
+
+    private Map<String, String> getParams(Location location) {
+        Map<String, String> params = new HashMap<>();
+        params.put("lat", String.valueOf(location.getLatitude()));
+        params.put("lng", String.valueOf(location.getLongitude()));
+        params.put("brand", "ChevronTexaco");
+        params.put("radius", String.valueOf(35));
+        return params;
+    }
 
     @Override
     public void onFragmentInteraction(String TAG, Object o) {
@@ -199,59 +278,6 @@ public class MainActivity extends AppCompatActivity
         return (filteredStations);
     }
 
-    @Override
-    public void onMapReady(final GoogleMap mMap) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    1);
-        }
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    // Got last known location. In some rare situations this can be null.
-                    if (location != null) {
-                        loc = location;
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(location.getLatitude(),
-                                        location.getLongitude()), 13));
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
-                                location.getLongitude())));
-                    }
-                });
-        gMap = mMap;
-    }
-
-    private void getNearbyStations(final Location location) {
-
-        Call<StationList> call = APIUtils.getStationService().getStations(getParams(location));
-        call.enqueue(new Callback<StationList>() {
-            @Override
-            public void onResponse(@NonNull Call<StationList> call, @NonNull Response<StationList> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        stations = response.body().stations;
-                    }
-                    markMap(stations);
-                    listReady.onListReady(applyFilters(filters));
-                    listReady.changeAddressText(location.getExtras().getString("address"));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<StationList> call, @NonNull Throwable t) {
-                Log.d("Error", t.getMessage());
-            }
-        });
-    }
-
-    private Map<String, String> getParams(Location location) {
-        Map<String, String> params = new HashMap<>();
-        params.put("lat", String.valueOf(location.getLatitude()));
-        params.put("lng", String.valueOf(location.getLongitude()));
-        params.put("brand", "ChevronTexaco");
-        params.put("radius", String.valueOf(35));
-        return params;
-    }
 
     @Override
     public void onListFragmentInteraction(Station station, int flag) {
@@ -274,14 +300,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void markMap(ArrayList<Station> stations) {
-        gMap.clear();
-        for (Station station : stations) {
-            gMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.techron_logo_lockup)));
-        }
-    }
 
     @Override
     public void onListFragmentInteraction(Prediction item) {
@@ -308,7 +326,7 @@ public class MainActivity extends AppCompatActivity
                     gMap.clear();
                     gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                             latLng, 13));
-                    gMap.addMarker(new MarkerOptions().position(latLng));
+                    loc = location;
                     getSupportFragmentManager().popBackStack();
                     getNearbyStations(location);
                 }
