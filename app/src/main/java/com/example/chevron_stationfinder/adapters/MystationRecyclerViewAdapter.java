@@ -76,7 +76,7 @@ public class MystationRecyclerViewAdapter extends RecyclerView.Adapter<Mystation
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         final View mView;
-        public final TextView stationName;
+        final TextView stationName;
         public final TextView stationAddress;
         public final TextView distance;
         public final ConstraintLayout amenitiesLayout;

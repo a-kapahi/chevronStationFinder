@@ -167,10 +167,10 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         recyclerView.getLayoutManager().startSmoothScroll(smoothScroller);
     }
 
-    public void checkEmptyList() {
+    private void checkEmptyList() {
         if (stations.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);
-            emptyText.setText("We couldn't find any stations near this location.");
+            emptyText.setText(R.string.empty_list_text);
             emptyText.setVisibility(View.VISIBLE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);

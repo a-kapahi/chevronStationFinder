@@ -17,7 +17,7 @@ public class Station implements Parcelable {
             return new Station[size];
         }
     };
-    public String id;
+    private String id;
     public String lat;
     public String lng;
     private String name;

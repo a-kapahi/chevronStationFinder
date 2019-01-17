@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    public void markMap(ArrayList<Station> stations) {
+    private void markMap(ArrayList<Station> stations) {
         gMap.clear();
         gMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())));
         for (Station station : stations) {

@@ -31,7 +31,6 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
 
     private OnFragmentInteractionListener mListener;
     private Station station;
-    private String TAG = "DetailsFragment";
 
     public StationDetailsFragment() {
         // Required empty public constructor
@@ -123,6 +122,7 @@ public class StationDetailsFragment extends Fragment implements OnClickListener 
                 break;
             }
             case R.id.closeButton:{
+                String TAG = "DetailsFragment";
                 mListener.onFragmentInteraction(TAG,v);
             }
         }

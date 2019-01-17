@@ -56,7 +56,7 @@ public class PredictionListAdapter extends RecyclerView.Adapter<PredictionListAd
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         final View mView;
-        public final TextView address;
+        final TextView address;
 
         ViewHolder(View view) {
             super(view);

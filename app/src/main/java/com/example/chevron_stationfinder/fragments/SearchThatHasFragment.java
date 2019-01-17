@@ -110,7 +110,7 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
         return view;
     }
 
-    public void initFilters() {
+    private void initFilters() {
         diesel.setChecked(hasDiesel);
         carWash.setChecked(hasCarWash);
         tapToPay.setChecked(hasTapToPay);
@@ -210,56 +210,50 @@ public class SearchThatHasFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        Drawable img;
         switch (compoundButton.getId()){
             case R.id.diesel: {
                 hasDiesel = b;
-                Drawable img = mContext.getDrawable(hasDiesel ? R.drawable.filter_icon_diesel_white : R.drawable.filter_icon_diesel_black);
-                img.setBounds(0, 0, 100, 100);
-                compoundButton.setCompoundDrawables(null, img, null, null);
+                img = mContext.getDrawable(hasDiesel ? R.drawable.filter_icon_diesel_white : R.drawable.filter_icon_diesel_black);
                 Log.d("diesel", String.valueOf(hasDiesel));
                 break;
             }
             case R.id.carWash: {
                 hasCarWash = b;
-                Drawable img = mContext.getDrawable(hasCarWash ? R.drawable.filter_icon_car_wash_white : R.drawable.filter_icon_car_wash_black);
-                img.setBounds(0, 0, 100, 100);
-                compoundButton.setCompoundDrawables(null, img, null, null);
+                img = mContext.getDrawable(hasCarWash ? R.drawable.filter_icon_car_wash_white : R.drawable.filter_icon_car_wash_black);
                 Log.d("car wash", String.valueOf(hasCarWash));
                 break;
             }
             case R.id.tapToPay: {
                 hasTapToPay = b;
-                Drawable img = mContext.getDrawable(hasTapToPay ? R.drawable.filter_icon_tap_to_pay_white : R.drawable.filter_icon_tap_to_pay_black);
-                img.setBounds(0, 0, 100, 100);
-                compoundButton.setCompoundDrawables(null, img, null, null);
+                img = mContext.getDrawable(hasTapToPay ? R.drawable.filter_icon_tap_to_pay_white : R.drawable.filter_icon_tap_to_pay_black);
                 Log.d("Tap to pay", String.valueOf(hasTapToPay));
                 break;
             }
             case R.id.store: {
                 hasStore = b;
-                Drawable img = mContext.getDrawable(hasStore ? R.drawable.filter_icon_store_white : R.drawable.filter_icon_store_black);
-                img.setBounds(0, 0, 100, 100);
-                compoundButton.setCompoundDrawables(null, img, null, null);
+                img = mContext.getDrawable(hasStore ? R.drawable.filter_icon_store_white : R.drawable.filter_icon_store_black);
                 Log.d("Store", String.valueOf(hasStore));
                 break;
             }
             case R.id.groceryRewards: {
                 hasGroceryRewards = b;
-                Drawable img = mContext.getDrawable(hasGroceryRewards ? R.drawable.filter_icon_grocery_rewards_white : R.drawable.filter_icon_grocery_rewards_black);
-                img.setBounds(0, 0, 100, 100);
-                compoundButton.setCompoundDrawables(null, img, null, null);
+                img = mContext.getDrawable(hasGroceryRewards ? R.drawable.filter_icon_grocery_rewards_white : R.drawable.filter_icon_grocery_rewards_black);
                 Log.d("Grocery rewards", String.valueOf(hasGroceryRewards));
                 break;
             }
             case R.id.extraMile: {
                 hasExtraMile = b;
-                Drawable img = mContext.getDrawable(hasExtraMile ? R.drawable.filter_icon_extramile_white : R.drawable.filter_icon_extramile_black);
-                img.setBounds(0, 0, 100, 100);
-                compoundButton.setCompoundDrawables(null, img, null, null);
+                img = mContext.getDrawable(hasExtraMile ? R.drawable.filter_icon_extramile_white : R.drawable.filter_icon_extramile_black);
                 Log.d("Extra mile", String.valueOf(hasExtraMile));
                 break;
             }
+            default: {
+                img = compoundButton.getButtonDrawable();
+                break;
+            }
         }
+        compoundButton.setCompoundDrawablesWithIntrinsicBounds(null, img, null, null);
         compoundButton.setTextColor(b ? Color.WHITE : Color.BLACK);
     }
 }
