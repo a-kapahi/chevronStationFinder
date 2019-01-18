@@ -108,7 +108,7 @@
         android:id="@+id/list"
         android:name="com.example.chevron_stationfinder.stationListFragment"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="230dp"
         android:background="@color/station_list_container_background"
         android:clipChildren="false"
         android:clipToPadding="false"

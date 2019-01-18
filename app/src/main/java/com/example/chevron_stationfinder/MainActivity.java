@@ -1,7 +1,6 @@
 package com.example.chevron_stationfinder;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -17,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.example.chevron_stationfinder.fragments.SearchAddressFragment;
 import com.example.chevron_stationfinder.fragments.SearchFragment;
@@ -44,6 +44,7 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,8 +59,9 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<Station> stations;
     private GoogleMap gMap;
     private OnStationListReady listReady;
-    private SharedPreferences savedFilters;
+    private SharedPreferences savedFilters, cache;
     private Integer[] filters;
+    private Map<String, String> cachedPredictions;
 
 
     @Override
@@ -72,13 +74,14 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         SearchFragment searchFragment = new SearchFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, searchFragment).addToBackStack(null).commit();
+                .add(R.id.fragment_container, searchFragment).addToBackStack("search").commit();
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        savedFilters = this.getPreferences(Context.MODE_PRIVATE);
+        cache = getSharedPreferences("cache", MODE_PRIVATE);
+        savedFilters = getSharedPreferences("filters", MODE_PRIVATE);
         if (savedFilters.getInt("distance", 0) == 0) {
             SharedPreferences.Editor editor = savedFilters.edit();
             editor.putInt("distance", 35);
@@ -124,6 +127,15 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
         gMap = mMap;
+        FrameLayout mapFrame = findViewById(R.id.map);
+        View googleLogo = mapFrame.findViewWithTag("GoogleWatermark");
+        RelativeLayout.LayoutParams glLayoutParams = (RelativeLayout.LayoutParams) googleLogo.getLayoutParams();
+        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_START, 0);
+        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
+        googleLogo.setLayoutParams(glLayoutParams);
         gMap.setOnMarkerClickListener(marker -> {
             stations.iterator().forEachRemaining(station -> {
                 if (marker.getPosition().latitude == Double.valueOf(station.lat) && marker.getPosition().longitude == Double.valueOf(station.lng)) {
@@ -193,12 +205,18 @@ public class MainActivity extends AppCompatActivity
                 }
                 case R.id.button2: {
                     Log.d("msg", "near Address");
-                    stationListFragment = StationListFragment.newInstance(stations, "Current Location");
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
+                    FragmentTransaction transaction;
+                    cachedPredictions = (Map<String, String>) cache.getAll();
+                    ArrayList<Prediction> predictions = new ArrayList<>();
+                    cachedPredictions.forEach(new BiConsumer<String, String>() {
+                        @Override
+                        public void accept(String s, String s2) {
+                            predictions.add(new Prediction(s2, s));
+                        }
+                    });
                     FrameLayout fullFragment = findViewById(R.id.full_fragment_container);
                     fullFragment.setVisibility(View.VISIBLE);
-                    SearchAddressFragment searchAddressFragment = new SearchAddressFragment();
+                    SearchAddressFragment searchAddressFragment = SearchAddressFragment.newInstance(predictions);
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.full_fragment_container, searchAddressFragment);
                     transaction.commit();
@@ -255,6 +273,14 @@ public class MainActivity extends AppCompatActivity
                 markMap(filteredStations);
 
             }
+        } else if (TAG.equals("SearchAddress")) {
+            if (o instanceof View) {
+                getNearbyStations(loc);
+                getSupportFragmentManager().popBackStack();
+                StationListFragment stationListFragment = StationListFragment.newInstance(stations, "Current Location");
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
+            }
         }
 
     }
@@ -305,6 +331,11 @@ public class MainActivity extends AppCompatActivity
         Map<String, String> params = new HashMap<>();
         params.put("placeid", item.getPlace_id());
         params.put("key", KEY);
+        if (!cachedPredictions.containsKey(item.getPlace_id())) {
+            SharedPreferences.Editor editor = cache.edit();
+            editor.putString(item.getPlace_id(), item.getDescription());
+            editor.commit();
+        }
         Call<JsonObject> call = PlacesAPIUtils.getPlacesService().getPlaceDetails(params);
         call.enqueue(new Callback<JsonObject>() {
             @Override
@@ -312,7 +343,7 @@ public class MainActivity extends AppCompatActivity
                 if (response.isSuccessful()) {
                     JsonObject object = response.body().getAsJsonObject("result").getAsJsonObject("geometry").getAsJsonObject("location");
                     Location location = new Location("location");
-                    Double lat, lng;
+                    double lat, lng;
                     lat = object.get("lat").getAsDouble();
                     lng = object.get("lng").getAsDouble();
                     LatLng latLng = new LatLng(lat, lng);
@@ -327,6 +358,9 @@ public class MainActivity extends AppCompatActivity
                             latLng, 13));
                     loc = location;
                     getSupportFragmentManager().popBackStack();
+                    StationListFragment stationListFragment = StationListFragment.newInstance(stations, "Current Location");
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, stationListFragment).addToBackStack(null).commit();
                     getNearbyStations(location);
                 }
             }

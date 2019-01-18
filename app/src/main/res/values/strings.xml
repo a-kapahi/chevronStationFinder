@@ -28,7 +28,8 @@
     <string name="amenities_button_text">Amenities</string>
     <string name="details_button_text">Details</string>
     <string name="logo_description">logo</string>
-    <string name="empty_list_text">We couldn\'t find any stations near this location.</string>
+    <string name="empty_list_text">We could\'t find any stations near this location.</string>
+    <string name="current_location_button_text">Current Location</string>
     <string-array name="distance_array">
         <item>1 mile</item>
         <item>3 miles</item>

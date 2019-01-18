@@ -12,12 +12,15 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.example.chevron_stationfinder.R;
 import com.example.chevron_stationfinder.adapters.PredictionListAdapter;
+import com.example.chevron_stationfinder.interfaces.OnFragmentInteractionListener;
 import com.example.chevron_stationfinder.models.Prediction;
 import com.example.chevron_stationfinder.utils.PlacesAPIUtils;
 import com.google.gson.JsonArray;
@@ -40,10 +43,13 @@ import retrofit2.Response;
 public class SearchAddressFragment extends Fragment {
 
     private static final String KEY = "AIzaSyDcthbWZfYguqLFE3ubQiESnNuIcV7rFSM";
-    private OnListFragmentInteractionListener mListener;
-    private ArrayList<Prediction> predictions;
+    private final String TAG = "SearchAddress";
+    private OnListFragmentInteractionListener mListListener;
+    private OnFragmentInteractionListener mListener;
     private PredictionListAdapter recyclerViewAdapter;
     private Context mContext;
+    private ArrayList<Prediction> predictions, cachedPredictions;
+    private Button currentLocation;
 
 
     /**
@@ -53,14 +59,22 @@ public class SearchAddressFragment extends Fragment {
     public SearchAddressFragment() {
     }
 
-    public static SearchAddressFragment newInstance() {
-        return new SearchAddressFragment();
+    public static SearchAddressFragment newInstance(ArrayList<Prediction> cachedPredictions) {
+        SearchAddressFragment searchAddressFragment = new SearchAddressFragment();
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("cachedPredictions", cachedPredictions);
+        searchAddressFragment.setArguments(args);
+        return searchAddressFragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            this.cachedPredictions = getArguments().getParcelableArrayList("cachedPredictions");
+        }
         predictions = new ArrayList<>();
+        predictions.addAll(cachedPredictions);
     }
 
     @Override
@@ -68,13 +82,20 @@ public class SearchAddressFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_prediction_list, container, false);
         EditText address = view.findViewById(R.id.address);
+        address.requestFocus();
+        address.postDelayed(() -> {
+            InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(address, InputMethodManager.SHOW_IMPLICIT);
+        }, 150);
         RecyclerView recyclerView = view.findViewById(R.id.prediction_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerViewAdapter = new PredictionListAdapter(predictions, mListener);
+        recyclerViewAdapter = new PredictionListAdapter(predictions, mListListener);
         DividerItemDecoration itemDecorator = new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(mContext.getDrawable(R.drawable.list_divider));
         recyclerView.addItemDecoration(itemDecorator);
         recyclerView.setAdapter(recyclerViewAdapter);
+        currentLocation = view.findViewById(R.id.currentLocation);
+        currentLocation.setOnClickListener(view12 -> mListener.onFragmentInteraction(TAG, view12));
         ImageButton clearButton = view.findViewById(R.id.clearButton);
         clearButton.setOnClickListener(view1 -> address.getText().clear());
         address.addTextChangedListener(new TextWatcher() {
@@ -101,7 +122,8 @@ public class SearchAddressFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+            mListListener = (OnListFragmentInteractionListener) context;
+            mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -112,6 +134,7 @@ public class SearchAddressFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        mListListener = null;
         mListener = null;
         FrameLayout container = getActivity().findViewById(R.id.full_fragment_container);
         container.setVisibility(View.GONE);
@@ -147,6 +170,12 @@ public class SearchAddressFragment extends Fragment {
                     JsonArray array = object.getAsJsonArray("predictions");
                     predictions.clear();
                     array.iterator().forEachRemaining(jsonElement -> predictions.add(new Prediction(jsonElement.getAsJsonObject().get("description").getAsString(), jsonElement.getAsJsonObject().get("place_id").getAsString())));
+                    if (predictions.isEmpty()) {
+                        currentLocation.setVisibility(View.VISIBLE);
+                        predictions.addAll(cachedPredictions);
+                    } else {
+                        currentLocation.setVisibility(View.GONE);
+                    }
                     recyclerViewAdapter.notifyDataSetChanged();
                 }
             }
