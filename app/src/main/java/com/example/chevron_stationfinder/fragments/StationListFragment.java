@@ -85,6 +85,12 @@ public class StationListFragment extends Fragment implements View.OnClickListene
             simpleProgressBar.setVisibility(View.GONE);
             checkEmptyList();
         }
+        if(address==null){
+            recyclerView.setVisibility(View.INVISIBLE);
+            emptyText.setVisibility(View.VISIBLE);
+            emptyText.setText("Location services aren't enabled on this device");
+            simpleProgressBar.setVisibility(View.GONE);
+        } else addressText.setText(this.address);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerViewAdapter = new MystationRecyclerViewAdapter(stations, mListListener);
@@ -102,7 +108,6 @@ public class StationListFragment extends Fragment implements View.OnClickListene
         Button optionsButton = view.findViewById(R.id.optionsBtn);
         optionsButton.setOnClickListener(this);
         stationCount.setText(String.valueOf(stations.size()));
-        addressText.setText(this.address);
         return view;
     }
 
@@ -151,8 +156,8 @@ public class StationListFragment extends Fragment implements View.OnClickListene
     public void changeAddressText(String address) {
         this.address = address;
         addressText.setText(this.address);
-
     }
+
 
     @Override
     public void scrollToStation(Station station) {

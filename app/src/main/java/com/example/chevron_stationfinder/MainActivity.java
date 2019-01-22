@@ -1,10 +1,15 @@
 package com.example.chevron_stationfinder;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -44,7 +49,6 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -80,6 +84,7 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         cache = getSharedPreferences("cache", MODE_PRIVATE);
         savedFilters = getSharedPreferences("filters", MODE_PRIVATE);
         if (savedFilters.getInt("distance", 0) == 0) {
@@ -96,6 +101,7 @@ public class MainActivity extends AppCompatActivity
         filters = new Integer[]{savedFilters.getInt("hasExtraMile", 0), savedFilters.getInt("hasGroceryRewards", 0), savedFilters.getInt("hasStore", 0), savedFilters.getInt("hasTapToPay", 0), savedFilters.getInt("hasCarWash", 0), savedFilters.getInt("hasDiesel", 0), savedFilters.getInt("distance", 35)};
     }
 
+
     @Override
     public void onAttachFragment(Fragment fragment) {
         if (fragment instanceof StationListFragment) {
@@ -106,23 +112,18 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onMapReady(final GoogleMap mMap) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    1);
-        }
+        statusCheck();
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, location -> {
-                    // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         loc = location;
                         Bundle extra = new Bundle();
                         extra.putString("address", "Current Location");
                         loc.setExtras(extra);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(location.getLatitude(),
                                         location.getLongitude()), 13));
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
+                        gMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
                                 location.getLongitude())));
                     }
                 });
@@ -146,9 +147,76 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+
+    public void statusCheck() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+        }
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        }
+
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, id) -> startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 1))
+                .setNegativeButton("No", (dialog, id) -> dialog.cancel());
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == 1) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_CANCELED) {
+                final LocationListener mLocationListener = new LocationListener() {
+                    @Override
+                    public void onLocationChanged(final Location location) {
+                        loc = location;
+                        Bundle extra = new Bundle();
+                        extra.putString("address", "Current Location");
+                        loc.setExtras(extra);
+                        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(),
+                                        location.getLongitude()), 13));
+                        gMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),
+                                location.getLongitude())));
+                    }
+
+                    @Override
+                    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String s) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String s) {
+
+                    }
+                };
+                LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,
+                        5, mLocationListener);
+            }
+        }
+    }
+
+
     private void markMap(ArrayList<Station> stations) {
         gMap.clear();
-        gMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())));
+        if(loc!=null) gMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())));
         for (Station station : stations) {
             gMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
@@ -157,26 +225,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getNearbyStations(final Location location) {
-
-        Call<StationList> call = APIUtils.getStationService().getStations(getParams(location));
-        call.enqueue(new Callback<StationList>() {
-            @Override
-            public void onResponse(@NonNull Call<StationList> call, @NonNull Response<StationList> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        stations = response.body().stations;
+        if (location != null) {
+            Call<StationList> call = APIUtils.getStationService().getStations(getParams(location));
+            call.enqueue(new Callback<StationList>() {
+                @Override
+                public void onResponse(@NonNull Call<StationList> call, @NonNull Response<StationList> response) {
+                    if (response.isSuccessful()) {
+                        if (response.body() != null) {
+                            stations = response.body().stations;
+                        }
+                        markMap(stations);
+                        listReady.onListReady(applyFilters(filters));
+                        listReady.changeAddressText(location.getExtras().getString("address"));
                     }
-                    markMap(stations);
-                    listReady.onListReady(applyFilters(filters));
-                    listReady.changeAddressText(location.getExtras().getString("address"));
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<StationList> call, @NonNull Throwable t) {
-                Log.d("Error", t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<StationList> call, @NonNull Throwable t) {
+                    Log.d("Error", t.getMessage());
+                }
+            });
+        }
     }
 
     private Map<String, String> getParams(Location location) {
@@ -196,7 +265,9 @@ public class MainActivity extends AppCompatActivity
             switch (view.getId()) {
                 case R.id.button: {
                     Log.d("msg", "Nearby presssed");
-                    stationListFragment = StationListFragment.newInstance(stations, "Current Location");
+                    String address;
+                    address = loc == null?null:"Current Location";
+                    stationListFragment = StationListFragment.newInstance(stations, address);
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).commit();
                     transaction.addToBackStack(null);
@@ -208,12 +279,7 @@ public class MainActivity extends AppCompatActivity
                     FragmentTransaction transaction;
                     cachedPredictions = (Map<String, String>) cache.getAll();
                     ArrayList<Prediction> predictions = new ArrayList<>();
-                    cachedPredictions.forEach(new BiConsumer<String, String>() {
-                        @Override
-                        public void accept(String s, String s2) {
-                            predictions.add(new Prediction(s2, s));
-                        }
-                    });
+                    cachedPredictions.forEach((s, s2) -> predictions.add(new Prediction(s2, s)));
                     FrameLayout fullFragment = findViewById(R.id.full_fragment_container);
                     fullFragment.setVisibility(View.VISIBLE);
                     SearchAddressFragment searchAddressFragment = SearchAddressFragment.newInstance(predictions);
