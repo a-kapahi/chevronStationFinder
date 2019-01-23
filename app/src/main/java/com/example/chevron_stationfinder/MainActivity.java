@@ -3,7 +3,6 @@ package com.example.chevron_stationfinder;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -216,7 +215,8 @@ public class MainActivity extends AppCompatActivity
 
     private void markMap(ArrayList<Station> stations) {
         gMap.clear();
-        if(loc!=null) gMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())));
+        if (loc != null)
+            gMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())));
         for (Station station : stations) {
             gMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(station.lat), Double.parseDouble(station.lng)))
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity
                 case R.id.button: {
                     Log.d("msg", "Nearby presssed");
                     String address;
-                    address = loc == null?null:"Current Location";
+                    address = loc == null ? null : "Current Location";
                     stationListFragment = StationListFragment.newInstance(stations, address);
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, stationListFragment).commit();
